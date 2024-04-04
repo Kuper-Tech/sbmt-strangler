@@ -1,0 +1,14 @@
+/.bundle/
+/.yardoc
+/_yardoc/
+/coverage/
+/doc/
+/pkg/
+/spec/reports/
+/tmp/
+.rspec_status
+lefthook-local.yml
+/Gemfile.lock
+/gemfiles/*gemfile*
+/spec/internal/log/*.log
+/.idea

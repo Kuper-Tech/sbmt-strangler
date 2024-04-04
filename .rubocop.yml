@@ -1,0 +1,17 @@
+inherit_gem:
+  sbmt-dev: config/rubocop.yml
+
+AllCops:
+  TargetRubyVersion: 3.3
+  TargetRailsVersion: 7.1
+  Exclude:
+    - spec/support/grpc/**/*
+
+Style/StringLiterals:
+  EnforcedStyle: single_quotes
+
+RSpec/FilePath:
+  Enabled: false
+
+RSpec/SpecFilePathFormat:
+  Enabled: false

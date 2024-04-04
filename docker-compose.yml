@@ -1,0 +1,26 @@
+services:
+  ruby:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        RUBY_VERSION: ${RUBY_VERSION:-3.3}
+        RUBYGEMS_VERSION: 3.5.7
+        BUNDLER_VERSION: 2.5.7
+    image: sbmt-strangler-dev:0.1.0-ruby_${RUBY_VERSION:-3.3}
+    environment:
+      HISTFILE: /app/tmp/.bash_history
+      BUNDLE_PATH: /usr/local/bundle
+      BUNDLE_CONFIG: /app/.bundle/config
+      prometheus_multiproc_dir: ./tmp
+    command: bash
+    working_dir: /app
+    volumes:
+      - .:/app:cached
+      - ${SBMT_RUBYGEMS_PATH:-..}:/app/vendor/gems:cached
+      - bundler_data:/usr/local/bundle
+    tmpfs:
+      - /tmp
+
+volumes:
+  bundler_data:

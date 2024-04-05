@@ -1,17 +1,54 @@
-inherit_gem:
-  sbmt-dev: config/rubocop.yml
+inherit_from: .rubocop_todo.yml
+
+# We want Exclude directives from different
+# config files to get merged, not overwritten
+inherit_mode:
+  merge:
+    - Exclude
 
 AllCops:
   TargetRubyVersion: 3.3
   TargetRailsVersion: 7.1
-  Exclude:
-    - spec/support/grpc/**/*
+  NewCops: enable
+  SuggestExtensions: false
 
-Style/StringLiterals:
-  EnforcedStyle: single_quotes
+require:
+  # Performance cops are bundled with Standard
+  - rubocop-performance
+  - rubocop-rails
+  - rubocop-rspec
+  # Standard's config uses custom cops,
+  # so it must be loaded
+  - standard
 
-RSpec/FilePath:
+inherit_gem:
+  standard: config/base.yml
+
+# rubocop-rails
+Rails/SkipsModelValidations:
   Enabled: false
 
-RSpec/SpecFilePathFormat:
+# rubocop-rspec
+RSpec/AnyInstance:
   Enabled: false
+
+RSpec/MultipleExpectations:
+  Enabled: false
+
+RSpec/LetSetup:
+  Enabled: false
+
+RSpec/StubbedMock:
+  Enabled: false
+
+RSpec/MessageSpies:
+  Enabled: false
+
+RSpec/NestedGroups:
+  Max: 10
+
+RSpec/ExampleLength:
+  Max: 35
+
+RSpec/MultipleMemoizedHelpers:
+  Max: 15

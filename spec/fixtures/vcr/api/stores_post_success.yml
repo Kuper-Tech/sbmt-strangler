@@ -1,0 +1,20 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: http://example.com:8080/api/stores
+    body:
+      encoding: UTF-8
+      string: '{"lat":"5","lon":"5"}'
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      date:
+        - Tue, 30 Mar 2024 10:55:00 GMT
+    body:
+      encoding: UTF-8
+      string: "[]"
+  recorded_at: Tue, 30 Mar 2024 10:55:00 GMT
+recorded_with: VCR 6.2.0

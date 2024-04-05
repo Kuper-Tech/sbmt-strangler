@@ -1,0 +1,14 @@
+---
+http_interactions:
+  - request:
+      method: get
+      uri: http://example.com/get_request
+    response:
+      status:
+        code: 200
+        message: OK
+      body:
+        encoding: ASCII-8BIT
+        string: '{"key": "value"}'
+    recorded_at: Wed, 23 Aug 2023 18:19:32 GMT
+recorded_with: VCR 6.2.0

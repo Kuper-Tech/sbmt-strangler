@@ -1,0 +1,17 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: http://example.com:8080/api/stores/1?id=1
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      date:
+        - Tue, 30 Mar 2024 10:55:00 GMT
+    body:
+      encoding: UTF-8
+      string: "{}"
+  recorded_at: Tue, 30 Mar 2024 10:55:00 GMT
+recorded_with: VCR 6.2.0

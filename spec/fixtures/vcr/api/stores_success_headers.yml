@@ -1,0 +1,29 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: http://example.com:8080/api/stores
+    body:
+      encoding: UTF-8
+      string: '{"lat":"5","lon":"5"}'
+    headers:
+      API-VERSION:
+        - '2.2'
+      X-REQUEST-ID:
+        - 9b8a43fb-ee77-4dc7-b537-821c274951a2
+      User-Agent:
+        - ios 1.0.0
+      Content-Type:
+        - application/json
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      date:
+        - Tue, 30 Mar 2024 10:55:00 GMT
+    body:
+      encoding: UTF-8
+      string: "[]"
+  recorded_at: Tue, 30 Mar 2024 10:55:00 GMT
+recorded_with: VCR 6.2.0

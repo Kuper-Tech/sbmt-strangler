@@ -26,7 +26,7 @@ module Sbmt
         end
 
         def define_module(module_name, parent_module_name)
-          return if parent_module_name.const_defined?(module_name)
+          return if parent_module_name.const_defined?(module_name, false)
 
           parent_module_name.const_set(module_name, Module.new)
         end

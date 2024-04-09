@@ -15,7 +15,6 @@ module Sbmt
       def initialize(options = {})
         @controllers = []
         @http = ActiveSupport::OrderedOptions.new.tap do |c|
-          c.client = "Sbmt::Strangler::Http::Client"
           c.keepalive_pool_size = Sbmt::Strangler::Http::DEFAULT_KEEPALIVE_POOL_SIZE
           c.keepalive_idle_timeout = Sbmt::Strangler::Http::DEFAULT_KEEPALIVE_IDLE_TIMEOUT
           c.timeout = Sbmt::Strangler::Http::DEFAULT_TIMEOUT

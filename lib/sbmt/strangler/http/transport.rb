@@ -26,13 +26,12 @@ module Sbmt
         def connection
           @connection ||= Faraday.new do |conn|
             conn.response :raise_error
-            Sbmt::Strangler::Http.configure_faraday(conn)
+            Sbmt::Strangler::Http.configure_faraday(conn, name: "strangler_http_client")
             conn.response :json
             conn.request :json
           end
         end
 
-        # TODO: использовать логгер из конфига?
         def with_error_handling(url)
           yield
         rescue Faraday::UnprocessableEntityError, Faraday::ForbiddenError => error

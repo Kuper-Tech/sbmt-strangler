@@ -5,7 +5,7 @@ describe Sbmt::Strangler::Http do
     let(:req_path) { "/get_request" }
 
     it "applies defaults" do
-      conn = Faraday.new { |f| described_class.configure_faraday(f) }
+      conn = Faraday.new { |f| described_class.configure_faraday(f, name: "test-client") }
 
       expect(conn.options.timeout).to eq(described_class::DEFAULT_TIMEOUT)
       expect(conn.options.open_timeout).to eq(described_class::DEFAULT_OPEN_TIMEOUT)
@@ -16,7 +16,7 @@ describe Sbmt::Strangler::Http do
 
     it "configures http client" do
       conn = Faraday.new("http://localhost") do |f|
-        described_class.configure_faraday(f)
+        described_class.configure_faraday(f, name: "test-client")
         f.adapter :test do |stubs|
           stubs.get(req_path) { [200, {}, ""] }
         end
@@ -24,6 +24,18 @@ describe Sbmt::Strangler::Http do
 
       resp = conn.get("#{req_path}?foo=1")
       expect(resp).to be_success
+
+      expect(Yabeda.sbmt_strangler.http_request_duration.values.keys.last).to eq(name: "test-client",
+        method: :get,
+        status: 200,
+        host: "localhost",
+        path: "/get_request")
+    end
+
+    it "raises an error if client name is not set" do
+      expect do
+        Faraday.new("http://localhost") { |f| described_class.configure_faraday(f) }
+      end.to raise_error(Sbmt::Strangler::ConfigurationError)
     end
 
     context "with custom http config" do
@@ -57,10 +69,34 @@ describe Sbmt::Strangler::Http do
       end
 
       it "overrides defaults" do
-        conn = Faraday.new { |f| described_class.configure_faraday(f) }
+        conn = Faraday.new { |f| described_class.configure_faraday(f, name: "test-client") }
 
         expect(conn.options.timeout).to eq(http_timeout)
         expect(conn.options.open_timeout).to eq(http_open_timeout)
+      end
+    end
+  end
+
+  describe "REQUEST_PATH_FILTER_REGEX" do
+    [
+      SecureRandom.uuid,
+      rand(1..1000).to_s,
+      "H01234567890-1"
+    ].each do |id|
+      context "when id is #{id.inspect}" do
+        it "works as a replacement pattern for id in the middle" do
+          path = "/foo/bar/#{id}/baz/42"
+          result = path.gsub(described_class::REQUEST_PATH_FILTER_REGEX, "/:id")
+
+          expect(result).to eq("/foo/bar/:id/baz/:id")
+        end
+
+        it "works as a replacement pattern for id at the end" do
+          path = "/foo/bar/#{id}"
+          result = path.gsub(described_class::REQUEST_PATH_FILTER_REGEX, "/:id")
+
+          expect(result).to eq("/foo/bar/:id")
+        end
       end
     end
   end

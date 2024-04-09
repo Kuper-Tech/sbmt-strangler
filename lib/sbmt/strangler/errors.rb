@@ -2,6 +2,6 @@
 
 module Sbmt
   module Strangler
-    VERSION = "0.2.0"
+    class ConfigurationError < StandardError; end
   end
 end

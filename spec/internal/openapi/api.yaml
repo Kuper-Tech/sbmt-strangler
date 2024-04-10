@@ -1,0 +1,31 @@
+---
+openapi: 3.0.1
+info:
+  title: API V1
+  version: v1
+servers:
+- url: http://example.com
+paths:
+  "/api/stores":
+    get:
+      summary: Получение магазинов
+      parameters:
+      - name: lat
+        in: query
+        required: true
+        schema:
+          type: number
+      - name: lon
+        in: query
+        required: true
+        schema:
+          type: number
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string

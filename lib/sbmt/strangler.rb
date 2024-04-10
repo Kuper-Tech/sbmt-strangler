@@ -59,7 +59,7 @@ module Sbmt
     end
 
     def logger
-      @logger ||= configuration.logger.constantize
+      @logger ||= Sbmt::Strangler::Logger.new
     end
   end
 end

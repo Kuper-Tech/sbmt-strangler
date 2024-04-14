@@ -33,6 +33,9 @@ Gem::Specification.new do |spec|
   spec.add_dependency "net-http-persistent", ">= 4.0.1"
   spec.add_dependency "rails", ">= 6.1", "< 8"
   spec.add_dependency "yabeda", ">= 0.11"
+  spec.add_dependency "flipper", ">= 1.2.2"
+  spec.add_dependency "concurrent-ruby", ">= 1.2.3"
+  spec.add_dependency "opentelemetry-instrumentation-concurrent_ruby"
   spec.add_dependency "oj"
   spec.add_dependency "dry-monads"
   spec.add_dependency "dry-struct"
@@ -53,4 +56,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "standard", ">= 1.7"
   spec.add_development_dependency "zeitwerk"
   spec.add_development_dependency "sentry-rails", "> 5.2.0"
+  spec.add_development_dependency "debug"
 end

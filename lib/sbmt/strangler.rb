@@ -5,6 +5,10 @@ require "dry-monads"
 require "yabeda"
 require "faraday"
 require "faraday/net_http_persistent"
+require "flipper"
+require "concurrent"
+require "opentelemetry-instrumentation-concurrent_ruby"
+require "securerandom"
 require "oj"
 
 begin
@@ -25,6 +29,7 @@ require_relative "strangler/errors"
 require_relative "strangler/error_tracker"
 require_relative "strangler/logger"
 require_relative "strangler/http"
+require_relative "strangler/flipper"
 
 require_relative "strangler/engine"
 

@@ -21,14 +21,27 @@ describe Api::StoresController, swagger_doc: "api.yaml" do
       let(:lon) { 5 }
       let(:lat) { 5 }
 
-      context "with success stf proxy mode", vcr: "api/stores_post_success" do # rubocop:disable RSpec/EmptyExampleGroup
-        response "200", "Success" do
-          schema({
-            type: "array",
-            items: {type: "string"}
-          })
+      response "200", "Success" do
+        schema({
+          type: "array",
+          items: {type: "string"}
+        })
 
-          run_test!
+        context "with success response from the proxied server", vcr: "api/stores_post_success" do
+          context "when proxy mode is active by default" do # rubocop:disable RSpec/EmptyExampleGroup
+            run_test!
+          end
+
+          context "when mirror mode enabled" do
+            include_context "with flipper enabled",
+              "Api::StoresController#index - mirror_work_mode",
+              "Api::StoresController#index - search",
+              "Api::StoresController#index - search_compare",
+              "Api::StoresController#index - render",
+              "Api::StoresController#index - render_compare"
+
+            run_test!
+          end
         end
       end
     end

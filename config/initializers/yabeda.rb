@@ -18,8 +18,14 @@ module Sbmt
               comment: "Parameters usage counter",
               tags: %i[params controller action]
             counter :work_mode,
-              comment: "Strangler mode counter: proxy, parallel, render",
+              comment: "Strangler mode counter: proxy, mirror, replace",
               tags: %i[mode params controller action]
+            counter :search_accuracy,
+              comment: "Search accuracy counter",
+              tags: %i[match params controller action]
+            counter :render_accuracy,
+              comment: "Render accuracy counter",
+              tags: %i[match params controller action]
           end
         end
       end

@@ -1,26 +1,56 @@
 # frozen_string_literal: true
 
+require_relative "action_invoker/proxy_work_mode"
+require_relative "action_invoker/mirror_work_mode"
+require_relative "action_invoker/replace_work_mode"
+
 module Sbmt
   module Strangler
     class ActionInvoker
-      WORK_MODE = {
-        proxy: "proxy"
-      }.freeze
+      include Sbmt::Strangler::ActionInvoker::ProxyWorkMode
+      include Sbmt::Strangler::ActionInvoker::MirrorWorkMode
+      include Sbmt::Strangler::ActionInvoker::ReplaceWorkMode
+
+      PROXY_WORK_MODE = :proxy
+      MIRROR_WORK_MODE = :mirror
+      REPLACE_WORK_MODE = :replace
 
       def initialize(action, rails_controller)
         @action = action
         @rails_controller = rails_controller
       end
 
-      delegate :http_params, :http_request, :render_proxy_response, :track_params_usage,
-        :track_work_tactic, to: :@rails_controller
+      delegate(
+        :logger, :render,
+        :http_params, :http_request, :render_proxy_response,
+        :track_params_usage, :track_work_mode,
+        :track_search_accuracy, :track_render_accuracy,
+        to: :@rails_controller
+      )
 
       def call
         track_params_usage
-        track_work_tactic(WORK_MODE[:proxy])
 
-        response = http_request(http_params)
-        render_proxy_response(response)
+        work_mode = choose_work_mode
+        track_work_mode(work_mode)
+
+        case work_mode
+        when REPLACE_WORK_MODE then replace_work_mode
+        when MIRROR_WORK_MODE then mirror_work_mode
+        when PROXY_WORK_MODE then proxy_work_mode
+        end
+      end
+
+      private
+
+      def choose_work_mode
+        return REPLACE_WORK_MODE if enabled?(@action.feature_flags.replace_work_mode)
+        return MIRROR_WORK_MODE if enabled?(@action.feature_flags.mirror_work_mode)
+        PROXY_WORK_MODE
+      end
+
+      def enabled?(feature_name)
+        @rails_controller.flipper_feature_enabled_anyhow?(feature_name)
       end
     end
   end

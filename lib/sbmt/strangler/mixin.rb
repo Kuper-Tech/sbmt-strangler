@@ -3,6 +3,8 @@
 module Sbmt
   module Strangler
     module Mixin
+      ANONYMOUSID_HEADER = "anonymousid"
+
       delegate :logger, to: "Sbmt::Strangler"
 
       def http_params
@@ -48,7 +50,8 @@ module Sbmt
       def render_proxy_response(response)
         if response.success?
           body, status = response.value!.values_at(:body, :status)
-          return render json: body, status: status
+          render json: body, status: status
+          return
         end
 
         body, status = response.failure.values_at(:body, :status)
@@ -72,14 +75,52 @@ module Sbmt
         end
       end
 
-      def track_work_tactic(mode, params = allowed_params)
+      def track_work_mode(mode, params = allowed_params)
         yabeda_tags = {
-          mode: mode,
+          mode: mode.to_s,
           params: params.to_h&.keys&.sort&.join(","),
           controller: controller_path,
           action: action_name
         }
         Yabeda.sbmt_strangler.work_mode.increment(yabeda_tags)
+      end
+
+      def track_search_accuracy(match, params = allowed_params)
+        yabeda_tags = {
+          match: match,
+          params: params.to_h&.keys&.sort&.join(","),
+          controller: controller_path,
+          action: action_name
+        }
+        Yabeda.sbmt_strangler.search_accuracy.increment(yabeda_tags)
+      end
+
+      def track_render_accuracy(match, params = allowed_params)
+        yabeda_tags = {
+          match: match,
+          params: params.to_h&.keys&.sort&.join(","),
+          controller: controller_path,
+          action: action_name
+        }
+        Yabeda.sbmt_strangler.render_accuracy.increment(yabeda_tags)
+      end
+
+      def anonymous_id
+        @anonymous_id ||= request.headers[ANONYMOUSID_HEADER].presence
+      end
+
+      def flipper_feature_enabled_for_actor?(feature_name)
+        actor = anonymous_id || SecureRandom.uuid
+        Sbmt::Strangler::Flipper.enabled_for_actor?(feature_name, actor)
+      end
+
+      def flipper_feature_enabled_on_time?(feature_name)
+        Sbmt::Strangler::Flipper.enabled_on_time?(feature_name)
+      end
+
+      def flipper_feature_enabled_anyhow?(feature_name)
+        flipper_feature_enabled_for_actor?(feature_name) ||
+          flipper_feature_enabled_on_time?(feature_name)
       end
     end
   end

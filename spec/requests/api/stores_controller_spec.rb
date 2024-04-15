@@ -29,7 +29,9 @@ describe Api::StoresController, swagger_doc: "api.yaml" do
 
         context "with success response from the proxied server", vcr: "api/stores_post_success" do
           context "when proxy mode is active by default" do # rubocop:disable RSpec/EmptyExampleGroup
-            run_test!
+            run_test! do
+              expect(response.body).to eq('["render_proxy_response"]')
+            end
           end
 
           context "when mirror mode enabled" do
@@ -40,7 +42,18 @@ describe Api::StoresController, swagger_doc: "api.yaml" do
               "Api::StoresController#index - render",
               "Api::StoresController#index - render_compare"
 
-            run_test!
+            run_test! do
+              expect(response.body).to eq('["render_proxy_response"]')
+            end
+          end
+        end
+
+        context "when replace mode enabled" do
+          include_context "with flipper enabled",
+            "Api::StoresController#index - replace_work_mode"
+
+          run_test! do
+            expect(response.body).to eq('["render_from_service"]')
           end
         end
       end

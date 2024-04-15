@@ -17,13 +17,18 @@ describe Api::StoresController do
         expect(response).to have_http_status(:success)
       end
 
+      it "renders proxy response", vcr: "api/stores_post_success" do
+        get_index
+        expect(response.body).to eq('["render_proxy_response"]')
+      end
+
       context "with metrics" do
         let(:params_usage_metric) { Yabeda.sbmt_strangler.params_usage }
         let(:work_mode_metric) { Yabeda.sbmt_strangler.work_mode }
         let(:params) { {} }
 
         around do |example|
-          VCR.use_cassette("api/stores_post_success", match_requests_on: %i[method], tag: :stf) do
+          VCR.use_cassette("api/stores_post_success", match_requests_on: %i[method]) do
             example.run
           end
         end
@@ -109,7 +114,7 @@ describe Api::StoresController do
           }
         end
 
-        it "sends headers to stf" do
+        it "sends headers to proxied server" do
           request.headers["HTTP_API_VERSION"] = "2.2"
           request.headers["HTTP_USER_AGENT"] = "ios 1.0.0"
           request.headers["HTTP_X_REQUEST_ID"] = "9b8a43fb-ee77-4dc7-b537-821c274951a2"
@@ -117,6 +122,100 @@ describe Api::StoresController do
           get_index
 
           expect(response).to have_http_status(:success)
+        end
+      end
+    end
+
+    context "with replace mode" do
+      include_context "with flipper enabled",
+        "Api::StoresController#index - replace_work_mode"
+
+      let(:params) { {} }
+
+      it "returns 200 code" do
+        get_index
+        expect(response).to have_http_status(:success)
+      end
+
+      it "renders from service" do
+        get_index
+        expect(response.body).to eq('["render_from_service"]')
+      end
+
+      context "with metrics" do
+        let(:params_usage_metric) { Yabeda.sbmt_strangler.params_usage }
+        let(:work_mode_metric) { Yabeda.sbmt_strangler.work_mode }
+        let(:params) { {a: 123, lat: 68.4897} }
+
+        after do
+          get_index
+        end
+
+        it "tracks param usage" do
+          expect(params_usage_metric).to receive(:increment).with({params: "lat", controller: "api/stores", action: "index"})
+        end
+
+        it "tracks work mode" do
+          expect(work_mode_metric).to receive(:increment).with({mode: "replace", params: "lat", controller: "api/stores", action: "index"})
+        end
+      end
+    end
+
+    context "with mirror mode" do
+      context "when proxied server responded successfully" do
+        around do |example|
+          VCR.use_cassette("api/stores_post_success", match_requests_on: %i[method]) do
+            example.run
+          end
+        end
+
+        context "when all extra render/search flags enabled" do
+          include_context "with flipper enabled",
+            "Api::StoresController#index - mirror_work_mode",
+            "Api::StoresController#index - search",
+            "Api::StoresController#index - search_compare",
+            "Api::StoresController#index - render",
+            "Api::StoresController#index - render_compare"
+
+          let(:params) { {} }
+
+          it "returns 200 code" do
+            get_index
+            expect(response).to have_http_status(:success)
+          end
+
+          it "renders proxy response" do
+            get_index
+            expect(response.body).to eq('["render_proxy_response"]')
+          end
+
+          context "with metrics" do
+            let(:params_usage_metric) { Yabeda.sbmt_strangler.params_usage }
+            let(:work_mode_metric) { Yabeda.sbmt_strangler.work_mode }
+            let(:search_accuracy_metric) { Yabeda.sbmt_strangler.search_accuracy }
+            let(:render_accuracy_metric) { Yabeda.sbmt_strangler.render_accuracy }
+            let(:params) { {a: 123, lat: 68.4897} }
+
+            after do
+              get_index
+            end
+
+            it "tracks param usage" do
+              expect(params_usage_metric).to receive(:increment).with({params: "lat", controller: "api/stores", action: "index"})
+            end
+
+            it "tracks work mode" do
+              expect(work_mode_metric).to receive(:increment).with({mode: "mirror", params: "lat", controller: "api/stores", action: "index"})
+            end
+
+            it "tracks search accuracy" do
+              expect(search_accuracy_metric).to receive(:increment).with({match: "true", params: "lat", controller: "api/stores", action: "index"})
+            end
+
+            it "tracks render accuracy" do
+              expect(render_accuracy_metric).to receive(:increment).with({match: "true", params: "lat", controller: "api/stores", action: "index"})
+            end
+          end
         end
       end
     end

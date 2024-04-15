@@ -21,10 +21,10 @@ module Sbmt
               comment: "Strangler mode counter: proxy, mirror, replace",
               tags: %i[mode params controller action]
             counter :search_accuracy,
-              comment: "Search accuracy counter",
+              comment: "Search accuracy counter: true, false, error",
               tags: %i[match params controller action]
             counter :render_accuracy,
-              comment: "Render accuracy counter",
+              comment: "Render accuracy counter: true, false, error",
               tags: %i[match params controller action]
           end
         end

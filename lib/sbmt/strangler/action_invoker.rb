@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
-require_relative "action_invoker/proxy_work_mode"
-require_relative "action_invoker/mirror_work_mode"
-require_relative "action_invoker/replace_work_mode"
+require_relative "action_invoker/work_modes/proxy"
+require_relative "action_invoker/work_modes/mirror"
+require_relative "action_invoker/work_modes/replace"
 
 module Sbmt
   module Strangler
     class ActionInvoker
-      include Sbmt::Strangler::ActionInvoker::ProxyWorkMode
-      include Sbmt::Strangler::ActionInvoker::MirrorWorkMode
-      include Sbmt::Strangler::ActionInvoker::ReplaceWorkMode
+      include Sbmt::Strangler::ActionInvoker::WorkModes::Proxy
+      include Sbmt::Strangler::ActionInvoker::WorkModes::Mirror
+      include Sbmt::Strangler::ActionInvoker::WorkModes::Replace
 
       PROXY_WORK_MODE = :proxy
       MIRROR_WORK_MODE = :mirror

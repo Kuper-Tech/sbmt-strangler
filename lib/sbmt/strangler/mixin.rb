@@ -87,7 +87,7 @@ module Sbmt
 
       def track_search_accuracy(match, params = allowed_params)
         yabeda_tags = {
-          match: match,
+          match: match.to_s,
           params: params.to_h&.keys&.sort&.join(","),
           controller: controller_path,
           action: action_name
@@ -97,7 +97,7 @@ module Sbmt
 
       def track_render_accuracy(match, params = allowed_params)
         yabeda_tags = {
-          match: match,
+          match: match.to_s,
           params: params.to_h&.keys&.sort&.join(","),
           controller: controller_path,
           action: action_name

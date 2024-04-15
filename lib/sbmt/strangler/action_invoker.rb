@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative "action_invoker/work_modes"
 require_relative "action_invoker/work_modes/proxy"
 require_relative "action_invoker/work_modes/mirror"
 require_relative "action_invoker/work_modes/replace"
@@ -10,10 +11,6 @@ module Sbmt
       include Sbmt::Strangler::ActionInvoker::WorkModes::Proxy
       include Sbmt::Strangler::ActionInvoker::WorkModes::Mirror
       include Sbmt::Strangler::ActionInvoker::WorkModes::Replace
-
-      PROXY_WORK_MODE = :proxy
-      MIRROR_WORK_MODE = :mirror
-      REPLACE_WORK_MODE = :replace
 
       def initialize(action, rails_controller)
         @action = action
@@ -35,18 +32,19 @@ module Sbmt
         track_work_mode(work_mode)
 
         case work_mode
-        when REPLACE_WORK_MODE then replace_work_mode
-        when MIRROR_WORK_MODE then mirror_work_mode
-        when PROXY_WORK_MODE then proxy_work_mode
+        when WorkModes::REPLACE then replace_work_mode
+        when WorkModes::MIRROR then mirror_work_mode
+        when WorkModes::PROXY then proxy_work_mode
+        else raise "Unexpected work mode: #{work_mode}!"
         end
       end
 
       private
 
       def choose_work_mode
-        return REPLACE_WORK_MODE if enabled?(@action.feature_flags.replace_work_mode)
-        return MIRROR_WORK_MODE if enabled?(@action.feature_flags.mirror_work_mode)
-        PROXY_WORK_MODE
+        return WorkModes::REPLACE if enabled?(@action.feature_flags.replace_work_mode)
+        return WorkModes::MIRROR if enabled?(@action.feature_flags.mirror_work_mode)
+        WorkModes::PROXY
       end
 
       def enabled?(feature_name)

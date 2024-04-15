@@ -37,20 +37,20 @@ module Sbmt
         rescue Faraday::UnprocessableEntityError, Faraday::ForbiddenError => error
           Failure(body: error.response_body, status: error.response_status, headers: error.response_headers)
         rescue Faraday::TimeoutError
-          Rails.logger.error(
+          Sbmt::Strangler.logger.error(
             message: "Sbmt::Strangler::Http::Transport TimeoutError",
             url: url
           )
           Failure(status: :gateway_timeout)
         rescue Faraday::Error => error
           response = error.response
-          Rails.logger.error(error.message)
+          Sbmt::Strangler.logger.error(error.message)
           Sbmt::Strangler.error_tracker.error(error)
           return Failure(status: :internal_server_error) unless response
 
           Failure(body: response[:body], status: response[:status], headers: response[:headers])
         rescue => error
-          Rails.logger.error(error.message)
+          Sbmt::Strangler.logger.error(error.message)
           Sbmt::Strangler.error_tracker.error(error)
           Failure(status: :internal_server_error)
         end

@@ -12,3 +12,5 @@ lefthook-local.yml
 /gemfiles/*gemfile*
 /spec/internal/log/*.log
 /.idea
+/.ruby-version
+/.ruby-gemset

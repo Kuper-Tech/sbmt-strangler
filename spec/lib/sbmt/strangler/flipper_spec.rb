@@ -8,25 +8,13 @@ describe Sbmt::Strangler::Flipper do
     end
   end
 
-  shared_examples "be(true)" do
-    it "returns true" do
-      expect(result).to be(true)
-    end
-  end
-
-  shared_examples "be(false)" do
-    it "returns false" do
-      expect(result).to be(false)
-    end
-  end
-
   describe ".enabled_for_actor?" do
     subject(:result) { described_class.enabled_for_actor?(feature_name, actor) }
 
     let(:feature_name) { "feature_name" }
     let(:actor) { "actor" }
 
-    include_examples "be(false)"
+    it("returns false") { expect(result).to be(false) }
 
     context "when feature enabled for actor" do
       let(:enabled_actor) { actor }
@@ -39,25 +27,25 @@ describe Sbmt::Strangler::Flipper do
         ::Flipper.disable(feature_name)
       end
 
-      include_examples "be(true)"
+      it("returns true") { expect(result).to be(true) }
 
       context "when fetaure enabled for another actor" do
         let(:enabled_actor) { "another_actor" }
 
-        include_examples "be(false)"
+        it("returns false") { expect(result).to be(false) }
       end
     end
 
     context "when feature_name is blank" do
       let(:feature_name) { nil }
 
-      include_examples "be(false)"
+      it("returns false") { expect(result).to be(false) }
     end
 
     context "when actor is blank" do
       let(:actor) { nil }
 
-      include_examples "be(false)"
+      it("returns false") { expect(result).to be(false) }
     end
   end
 
@@ -66,7 +54,7 @@ describe Sbmt::Strangler::Flipper do
 
     let(:feature_name) { "feature_name" }
 
-    include_examples "be(false)"
+    it("returns false") { expect(result).to be(false) }
 
     context "when feature enabled for current hour" do
       let(:enabled_hour) { Time.current.hour }
@@ -80,19 +68,19 @@ describe Sbmt::Strangler::Flipper do
         ::Flipper.disable(feature_name)
       end
 
-      include_examples "be(true)"
+      it("returns true") { expect(result).to be(true) }
 
       context "when fetaure enabled for another hours range" do
         let(:enabled_hour) { (Time.current.hour > 12) ? 3 : 15 }
 
-        include_examples "be(false)"
+        it("returns false") { expect(result).to be(false) }
       end
     end
 
     context "when feature_name is blank" do
       let(:feature_name) { nil }
 
-      include_examples "be(false)"
+      it("returns false") { expect(result).to be(false) }
     end
   end
 end

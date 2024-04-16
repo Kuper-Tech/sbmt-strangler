@@ -35,7 +35,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "yabeda", ">= 0.11"
   spec.add_dependency "flipper", ">= 1.2.2"
   spec.add_dependency "concurrent-ruby", ">= 1.2.3"
-  spec.add_dependency "opentelemetry-instrumentation-concurrent_ruby"
   spec.add_dependency "oj"
   spec.add_dependency "dry-monads"
   spec.add_dependency "dry-struct"

@@ -7,14 +7,16 @@ require "faraday"
 require "faraday/net_http_persistent"
 require "flipper"
 require "concurrent"
-require "opentelemetry-instrumentation-concurrent_ruby"
 require "securerandom"
 require "oj"
 
-begin
-  require "sentry-rails"
+# Optional dependencies
+%w[
+  sentry-rails
+  opentelemetry-instrumentation-concurrent_ruby
+].each do |dependency|
+  require dependency
 rescue LoadError
-  # optional dependency
 end
 
 require_relative "strangler/configurable"
@@ -30,6 +32,7 @@ require_relative "strangler/error_tracker"
 require_relative "strangler/logger"
 require_relative "strangler/http"
 require_relative "strangler/flipper"
+require_relative "strangler/feature_flags"
 
 require_relative "strangler/engine"
 

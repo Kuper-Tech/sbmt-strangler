@@ -1,34 +1,24 @@
 # frozen_string_literal: true
 
-require_relative "action/feature_flags"
-
 module Sbmt
   module Strangler
     class Action
       extend Sbmt::Strangler::Configurable
 
-      option :params_tracking_allowlist, :headers_allowlist, default_from: :@controller
+      option :params_tracking_allowlist, :headers_allowlist, :flipper_actor, default_from: :controller
+      option :proxy_url, :proxy_http_verb
+      option :mirror, default: ->(_rails_controller) {}
+      option :mirror_compare, default: ->(_origin_response, _mirror_result) { false }
 
-      option :search, default: -> {}
-      option :search_compare, default: ->(_search_result, _proxy_response) { false }
-      option :render, default: ->(_search_result) {}
-      option :render_compare, default: ->(_render_result, _proxy_response) { false }
-
-      attr_accessor :proxy_url, :proxy_http_verb
-      attr_reader :name, :feature_flags
+      attr_reader :name, :controller
 
       def initialize(name, controller, &)
         @name = name
         @controller = controller
 
-        @feature_flags = Sbmt::Strangler::Action::FeatureFlags.new(self)
-        @feature_flags.add_all!
+        Sbmt::Strangler::FeatureFlags.new(strangler_action: self).add_all!
 
         yield(self)
-      end
-
-      def controller_name
-        @controller.name
       end
     end
   end

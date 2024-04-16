@@ -4,24 +4,19 @@ module Sbmt
   module Strangler
     module WorkModes
       class Base
-        def self.name_for_metric
-          name.demodulize.underscore
-        end
+        attr_reader :rails_controller, :strangler_action, :feature_flags
 
-        def initialize(action, rails_controller)
-          @action = action
+        def initialize(rails_controller:, strangler_action:, feature_flags:)
           @rails_controller = rails_controller
+          @strangler_action = strangler_action
+          @feature_flags = feature_flags
         end
 
         def call
-          raise "Must be implemented in sub-class!"
+          raise NotImplementedError
         end
 
         private
-
-        def enabled?(feature_name)
-          @rails_controller.flipper_feature_enabled_anyhow?(feature_name)
-        end
 
         def handle_error(err)
           Sbmt::Strangler.error_tracker.error(err)

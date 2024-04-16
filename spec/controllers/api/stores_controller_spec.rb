@@ -19,7 +19,7 @@ describe Api::StoresController do
 
       it "renders proxy response", vcr: "api/stores_post_success" do
         get_index
-        expect(response.body).to eq('["render_proxy_response"]')
+        expect(response.body).to eq('["origin_response"]')
       end
 
       context "with metrics" do
@@ -127,8 +127,7 @@ describe Api::StoresController do
     end
 
     context "with replace mode" do
-      include_context "with flipper enabled",
-        "Api::StoresController#index - replace_work_mode"
+      include_context "with flipper enabled", "api/stores#index:replace"
 
       let(:params) { {} }
 
@@ -139,7 +138,7 @@ describe Api::StoresController do
 
       it "renders from service" do
         get_index
-        expect(response.body).to eq('["render_from_service"]')
+        expect(response.body).to eq('["mirror_result"]')
       end
 
       context "with metrics" do
@@ -170,12 +169,7 @@ describe Api::StoresController do
         end
 
         context "when all extra render/search flags enabled" do
-          include_context "with flipper enabled",
-            "Api::StoresController#index - mirror_work_mode",
-            "Api::StoresController#index - search",
-            "Api::StoresController#index - search_compare",
-            "Api::StoresController#index - render",
-            "Api::StoresController#index - render_compare"
+          include_context "with flipper enabled", "api/stores#index:mirror"
 
           let(:params) { {} }
 
@@ -186,14 +180,13 @@ describe Api::StoresController do
 
           it "renders proxy response" do
             get_index
-            expect(response.body).to eq('["render_proxy_response"]')
+            expect(response.body).to eq('["origin_response"]')
           end
 
           context "with metrics" do
             let(:params_usage_metric) { Yabeda.sbmt_strangler.params_usage }
             let(:work_mode_metric) { Yabeda.sbmt_strangler.work_mode }
-            let(:search_accuracy_metric) { Yabeda.sbmt_strangler.search_accuracy }
-            let(:render_accuracy_metric) { Yabeda.sbmt_strangler.render_accuracy }
+            let(:mirror_compare_metric) { Yabeda.sbmt_strangler.mirror_compare }
             let(:params) { {a: 123, lat: 68.4897} }
 
             after do
@@ -208,12 +201,8 @@ describe Api::StoresController do
               expect(work_mode_metric).to receive(:increment).with({mode: "mirror", params: "lat", controller: "api/stores", action: "index"})
             end
 
-            it "tracks search accuracy" do
-              expect(search_accuracy_metric).to receive(:increment).with({match: "true", params: "lat", controller: "api/stores", action: "index"})
-            end
-
-            it "tracks render accuracy" do
-              expect(render_accuracy_metric).to receive(:increment).with({match: "true", params: "lat", controller: "api/stores", action: "index"})
+            it "tracks mirror compare" do
+              expect(mirror_compare_metric).to receive(:increment).with({match: "true", params: "lat", controller: "api/stores", action: "index"})
             end
           end
         end

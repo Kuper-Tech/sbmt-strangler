@@ -8,6 +8,7 @@ module Sbmt
       option :params_tracking_allowlist, :headers_allowlist, default: []
       option :action_controller_base_class, default: "ActionController::Base"
       option :error_tracker, default: "Sbmt::Strangler::ErrorTracker"
+      option :flipper_actor
 
       attr_reader :controllers, :http
 
@@ -24,7 +25,7 @@ module Sbmt
       end
 
       def controller(name, &)
-        @controllers.push(Sbmt::Strangler::Controller.new(name, self, &))
+        controllers.push(Sbmt::Strangler::Controller.new(name, self, &))
       end
     end
   end

@@ -11,13 +11,9 @@ Sbmt::Strangler.configure do |strangler|
     controller.action("index") do |action|
       action.proxy_url = "http://example.com:8080/api/stores"
       action.proxy_http_verb = :post
-      action.search = -> { "render_from_service" }
-      action.search_compare = ->(search_result, proxy_response) {
-        search_result == "render_from_service" && proxy_response == '["render_proxy_response"]'
-      }
-      action.render = ->(search_result) { [search_result].to_json }
-      action.render_compare = ->(render_result, proxy_response) {
-        render_result == '["render_from_service"]' && proxy_response == '["render_proxy_response"]'
+      action.mirror = ->(_rails_controller) { '["mirror_result"]' }
+      action.mirror_compare = ->(origin_response, mirror_result) {
+        mirror_result == '["mirror_result"]' && origin_response == '["origin_response"]'
       }
     end
 

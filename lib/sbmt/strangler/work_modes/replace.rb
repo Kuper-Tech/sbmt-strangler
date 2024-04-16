@@ -7,14 +7,13 @@ module Sbmt
     module WorkModes
       class Replace < Base
         def call
-          search_result = @action.search.call
-          render_result = @action.render.call(search_result)
-          render json: render_result
+          mirror_result = strangler_action.mirror.call(rails_controller)
+          render json: mirror_result
         end
 
         private
 
-        delegate :render, to: :@rails_controller
+        delegate :render, to: :rails_controller
       end
     end
   end

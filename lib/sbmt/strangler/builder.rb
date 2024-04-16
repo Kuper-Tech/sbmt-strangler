@@ -6,18 +6,25 @@ module Sbmt
       class << self
         def call!(configuration = Sbmt::Strangler.configuration)
           configuration.controllers.each do |controller|
-            unless Object.const_defined?(controller.name)
-              Sbmt::Strangler::ConstDefiner.call!(controller.name, Class.new(Sbmt::Strangler.action_controller_base_class))
+            unless Object.const_defined?(controller.class_name)
+              Sbmt::Strangler::ConstDefiner.call!(controller.class_name, Class.new(Sbmt::Strangler.action_controller_base_class))
             end
 
-            controller.name.constantize.class_eval do
+            controller.class_name.constantize.class_eval do
               include Sbmt::Strangler::Mixin
 
               controller.actions.each do |action|
                 define_method(action.name) do
                   @strangler_action = action
 
-                  Sbmt::Strangler::ActionInvoker.new(action, self).call
+                  Sbmt::Strangler::ActionInvoker.new(
+                    rails_controller: self,
+                    strangler_action: action,
+                    feature_flags: Sbmt::Strangler::FeatureFlags.new(
+                      rails_controller: self,
+                      strangler_action: action
+                    )
+                  ).call
                 end
               end
             end

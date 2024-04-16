@@ -1,9 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "work_modes/proxy"
-require_relative "work_modes/mirror"
-require_relative "work_modes/replace"
-
 module Sbmt
   module Strangler
     class ActionInvoker

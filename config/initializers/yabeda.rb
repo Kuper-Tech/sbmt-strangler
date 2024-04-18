@@ -18,8 +18,17 @@ module Sbmt
               comment: "Parameters usage counter",
               tags: %i[params controller action]
             counter :work_mode,
-              comment: "Strangler mode counter: proxy, parallel, render",
+              comment: "Work mode counter (mode: proxy, mirror, replace)",
               tags: %i[mode params controller action]
+            counter :mirror_call,
+              comment: "Mirror lambda call counter (success: true, false)",
+              tags: %i[success params controller action]
+            counter :compare_call,
+              comment: "Compare lambda call counter (success: true, false)",
+              tags: %i[success params controller action]
+            counter :compare_result,
+              comment: "Compare lambda successfull call result counter (value: true, false)",
+              tags: %i[value params controller action]
           end
         end
       end

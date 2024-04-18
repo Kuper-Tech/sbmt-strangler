@@ -5,14 +5,18 @@ module Sbmt
     class Action
       extend Sbmt::Strangler::Configurable
 
-      option :params_tracking_allowlist, :headers_allowlist, default_from: :@controller
+      option :params_tracking_allowlist, :headers_allowlist, :flipper_actor, default_from: :controller
+      option :proxy_url, :proxy_http_verb
+      option :mirror, default: ->(_rails_controller) {}
+      option :compare, default: ->(_origin_response_body, _mirror_result) { false }
 
-      attr_accessor :proxy_url, :proxy_http_verb
-      attr_reader :name
+      attr_reader :name, :controller
 
       def initialize(name, controller, &)
         @name = name
         @controller = controller
+
+        Sbmt::Strangler::FeatureFlags.new(strangler_action: self).add_all!
 
         yield(self)
       end

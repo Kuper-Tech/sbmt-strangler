@@ -3,24 +3,41 @@
 module Sbmt
   module Strangler
     class ActionInvoker
-      WORK_MODE = {
-        proxy: "proxy"
-      }.freeze
+      attr_reader :rails_controller, :strangler_action, :metric_tracker, :feature_flags
 
-      def initialize(action, rails_controller)
-        @action = action
+      def initialize(rails_controller:, strangler_action:, metric_tracker:, feature_flags:)
         @rails_controller = rails_controller
+        @strangler_action = strangler_action
+        @metric_tracker = metric_tracker
+        @feature_flags = feature_flags
       end
 
-      delegate :http_params, :http_request, :render_proxy_response, :track_params_usage,
-        :track_work_tactic, to: :@rails_controller
+      delegate :track_params_usage, :track_work_mode, :log_unallowed_params, to: :metric_tracker
 
       def call
         track_params_usage
-        track_work_tactic(WORK_MODE[:proxy])
+        log_unallowed_params
+        track_work_mode(work_mode_class.name.demodulize.underscore)
+        work_mode_class.new(
+          rails_controller:,
+          strangler_action:,
+          metric_tracker:,
+          feature_flags:
+        ).call
+      end
 
-        response = http_request(http_params)
-        render_proxy_response(response)
+      private
+
+      def work_mode_class
+        @work_mode_class ||=
+          # TODO: enable 'replace' work mode
+          # if feature_flags.replace?
+          #   Sbmt::Strangler::WorkModes::Replace
+          if feature_flags.mirror?
+            Sbmt::Strangler::WorkModes::Mirror
+          else
+            Sbmt::Strangler::WorkModes::Proxy
+          end
       end
     end
   end

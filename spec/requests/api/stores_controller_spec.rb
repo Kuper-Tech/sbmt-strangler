@@ -21,14 +21,34 @@ describe Api::StoresController, swagger_doc: "api.yaml" do
       let(:lon) { 5 }
       let(:lat) { 5 }
 
-      context "with success stf proxy mode", vcr: "api/stores_post_success" do # rubocop:disable RSpec/EmptyExampleGroup
-        response "200", "Success" do
-          schema({
-            type: "array",
-            items: {type: "string"}
-          })
+      response "200", "Success" do
+        schema({
+          type: "array",
+          items: {type: "string"}
+        })
 
-          run_test!
+        context "with success response from the proxied server", vcr: "api/stores_post_success" do
+          context "when proxy mode is active by default" do # rubocop:disable RSpec/EmptyExampleGroup
+            run_test! do
+              expect(response.body).to eq('["origin_response_body"]')
+            end
+          end
+
+          context "when mirror mode enabled" do
+            include_context "with flipper enabled", "api/stores#index:mirror"
+
+            run_test! do
+              expect(response.body).to eq('["origin_response_body"]')
+            end
+          end
+        end
+
+        context "when replace mode enabled", pending: "TODO: enable 'replace' mode" do
+          include_context "with flipper enabled", "api/stores#index:replace"
+
+          run_test! do
+            expect(response.body).to eq('["mirror_result"]')
+          end
         end
       end
     end

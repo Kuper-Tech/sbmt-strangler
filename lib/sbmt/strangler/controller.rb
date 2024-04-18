@@ -5,12 +5,13 @@ module Sbmt
     class Controller
       extend Sbmt::Strangler::Configurable
 
-      option :params_tracking_allowlist, :headers_allowlist, default_from: :@configuration
+      option :params_tracking_allowlist, :headers_allowlist, :flipper_actor, default_from: :configuration
 
-      attr_reader :actions, :name
+      attr_reader :name, :class_name, :actions, :configuration
 
       def initialize(name, configuration, &)
-        @name = "#{name.camelize}Controller"
+        @name = name
+        @class_name = "#{name.camelize}Controller"
         @actions = []
         @configuration = configuration
 

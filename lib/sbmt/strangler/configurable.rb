@@ -4,7 +4,11 @@ module Sbmt
   module Strangler
     module Configurable
       def option(*hash)
-        hash in [*attributes, Hash => options]
+        case hash
+        in [*attributes, Hash => options]
+        in [*attributes]
+          options = {}
+        end
 
         attributes.each do |attribute|
           define_method :"#{attribute}=" do |value|
@@ -16,7 +20,7 @@ module Sbmt
             return value if value
 
             if options[:default_from]
-              value = instance_variable_get(options[:default_from])&.public_send(attribute)
+              value = send(options[:default_from])&.public_send(attribute)
             end
 
             value || options[:default]

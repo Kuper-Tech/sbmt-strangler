@@ -30,7 +30,7 @@ describe Api::StoresController, swagger_doc: "api.yaml" do
         context "with success response from the proxied server", vcr: "api/stores_post_success" do
           context "when proxy mode is active by default" do # rubocop:disable RSpec/EmptyExampleGroup
             run_test! do
-              expect(response.body).to eq('["origin_response"]')
+              expect(response.body).to eq('["origin_response_body"]')
             end
           end
 
@@ -38,12 +38,12 @@ describe Api::StoresController, swagger_doc: "api.yaml" do
             include_context "with flipper enabled", "api/stores#index:mirror"
 
             run_test! do
-              expect(response.body).to eq('["origin_response"]')
+              expect(response.body).to eq('["origin_response_body"]')
             end
           end
         end
 
-        xcontext "when replace mode enabled" do
+        context "when replace mode enabled", pending: "TODO: enable 'replace' mode" do
           include_context "with flipper enabled", "api/stores#index:replace"
 
           run_test! do

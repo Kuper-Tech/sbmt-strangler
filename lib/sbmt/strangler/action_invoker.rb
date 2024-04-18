@@ -30,7 +30,7 @@ module Sbmt
 
       def work_mode_class
         @work_mode_class ||=
-          # TODO: enabled 'replace' work mode
+          # TODO: enable 'replace' work mode
           # if feature_flags.replace?
           #   Sbmt::Strangler::WorkModes::Replace
           if feature_flags.mirror?

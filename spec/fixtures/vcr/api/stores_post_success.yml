@@ -15,6 +15,6 @@ http_interactions:
         - Tue, 30 Mar 2024 10:55:00 GMT
     body:
       encoding: UTF-8
-      string: '["origin_response"]'
+      string: '["origin_response_body"]'
   recorded_at: Tue, 30 Mar 2024 10:55:00 GMT
 recorded_with: VCR 6.2.0

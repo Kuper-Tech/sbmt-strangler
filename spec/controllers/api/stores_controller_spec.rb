@@ -19,7 +19,7 @@ describe Api::StoresController do
 
       it "renders proxy response", vcr: "api/stores_post_success" do
         get_index
-        expect(response.body).to eq('["origin_response"]')
+        expect(response.body).to eq('["origin_response_body"]')
       end
 
       context "with metrics" do
@@ -126,7 +126,7 @@ describe Api::StoresController do
       end
     end
 
-    xcontext "with replace mode" do
+    context "with replace mode", pending: "TODO: enable 'replace' mode" do
       include_context "with flipper enabled", "api/stores#index:replace"
 
       let(:params) { {} }
@@ -179,7 +179,7 @@ describe Api::StoresController do
 
         it "renders proxy response" do
           get_index
-          expect(response.body).to eq('["origin_response"]')
+          expect(response.body).to eq('["origin_response_body"]')
         end
 
         context "with metrics" do

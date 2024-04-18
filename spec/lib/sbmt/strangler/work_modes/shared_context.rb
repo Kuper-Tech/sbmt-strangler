@@ -18,13 +18,19 @@ RSpec.shared_context "with work mode implemetation context" do
       cfg.action_controller_base_class = "Object"
       cfg.controller "test" do |ctrl|
         ctrl.action "index" do |act|
+          act.mirror = ->(_rails_controller) { mirror_result }
+          act.compare = ->(_origin_response_body, _mirror_result) { compare_result }
         end
       end
     end
   end
+
   let(:strangler_controller) { strangler_config.controllers.first }
   let(:strangler_action) { strangler_controller.actions.first }
   let(:metric_tracker) { instance_double(Sbmt::Strangler::MetricTracker) }
-  let(:rails_controller) { instance_double(TestController) }
+  let(:rails_controller) { instance_double(TestController, controller_path: "test", action_name: "index") }
   let(:feature_flags) { instance_double(Sbmt::Strangler::FeatureFlags) }
+
+  let(:mirror_result) { "mirror_result" }
+  let(:compare_result) { true }
 end

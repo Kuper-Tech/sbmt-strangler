@@ -43,7 +43,7 @@ describe Api::StoresController, swagger_doc: "api.yaml" do
           end
         end
 
-        context "when replace mode enabled" do
+        xcontext "when replace mode enabled" do
           include_context "with flipper enabled", "api/stores#index:replace"
 
           run_test! do

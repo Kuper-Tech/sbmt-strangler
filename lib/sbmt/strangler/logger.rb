@@ -18,6 +18,12 @@ module Sbmt
         end
       end
 
+      def log_warn(message, **params)
+        with_tags(**params) do
+          logger.warn(message)
+        end
+      end
+
       def log_error(message, **params)
         with_tags(**params) do
           logger.error(message)

@@ -3,6 +3,7 @@ RSpec.shared_context "with work mode implemetation context" do
     described_class.new(
       rails_controller: rails_controller,
       strangler_action: strangler_action,
+      metric_tracker: metric_tracker,
       feature_flags: feature_flags
     )
   end
@@ -23,6 +24,7 @@ RSpec.shared_context "with work mode implemetation context" do
   end
   let(:strangler_controller) { strangler_config.controllers.first }
   let(:strangler_action) { strangler_controller.actions.first }
+  let(:metric_tracker) { instance_double(Sbmt::Strangler::MetricTracker) }
   let(:rails_controller) { instance_double(TestController) }
   let(:feature_flags) { instance_double(Sbmt::Strangler::FeatureFlags) }
 end

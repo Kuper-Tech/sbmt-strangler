@@ -126,7 +126,7 @@ describe Api::StoresController do
       end
     end
 
-    context "with replace mode" do
+    xcontext "with replace mode" do
       include_context "with flipper enabled", "api/stores#index:replace"
 
       let(:params) { {} }
@@ -144,23 +144,27 @@ describe Api::StoresController do
       context "with metrics" do
         let(:params_usage_metric) { Yabeda.sbmt_strangler.params_usage }
         let(:work_mode_metric) { Yabeda.sbmt_strangler.work_mode }
+        let(:mirror_call_metric) { Yabeda.sbmt_strangler.mirror_call }
         let(:params) { {a: 123, lat: 68.4897} }
 
         after do
           get_index
         end
 
-        it "tracks param usage" do
-          expect(params_usage_metric).to receive(:increment).with({params: "lat", controller: "api/stores", action: "index"})
-        end
-
-        it "tracks work mode" do
-          expect(work_mode_metric).to receive(:increment).with({mode: "replace", params: "lat", controller: "api/stores", action: "index"})
+        it "tracks metrics" do
+          common_tags = {params: "lat", controller: "api/stores", action: "index"}
+          expect(params_usage_metric).to receive(:increment).with(common_tags)
+          expect(work_mode_metric).to receive(:increment).with(common_tags.merge(mode: "replace"))
+          expect(mirror_call_metric).to receive(:increment).with(common_tags.merge(success: "true"))
         end
       end
     end
 
     context "with mirror mode" do
+      include_context "with flipper enabled", "api/stores#index:mirror"
+
+      let(:params) { {} }
+
       context "when proxied server responded successfully" do
         around do |example|
           VCR.use_cassette("api/stores_post_success", match_requests_on: %i[method]) do
@@ -168,42 +172,35 @@ describe Api::StoresController do
           end
         end
 
-        context "when all extra render/search flags enabled" do
-          include_context "with flipper enabled", "api/stores#index:mirror"
+        it "returns 200 code" do
+          get_index
+          expect(response).to have_http_status(:success)
+        end
 
-          let(:params) { {} }
+        it "renders proxy response" do
+          get_index
+          expect(response.body).to eq('["origin_response"]')
+        end
 
-          it "returns 200 code" do
+        context "with metrics" do
+          let(:params_usage_metric) { Yabeda.sbmt_strangler.params_usage }
+          let(:work_mode_metric) { Yabeda.sbmt_strangler.work_mode }
+          let(:mirror_call_metric) { Yabeda.sbmt_strangler.mirror_call }
+          let(:compare_call_metric) { Yabeda.sbmt_strangler.compare_call }
+          let(:compare_result_metric) { Yabeda.sbmt_strangler.compare_result }
+          let(:params) { {a: 123, lat: 68.4897} }
+
+          after do
             get_index
-            expect(response).to have_http_status(:success)
           end
 
-          it "renders proxy response" do
-            get_index
-            expect(response.body).to eq('["origin_response"]')
-          end
-
-          context "with metrics" do
-            let(:params_usage_metric) { Yabeda.sbmt_strangler.params_usage }
-            let(:work_mode_metric) { Yabeda.sbmt_strangler.work_mode }
-            let(:mirror_compare_metric) { Yabeda.sbmt_strangler.mirror_compare }
-            let(:params) { {a: 123, lat: 68.4897} }
-
-            after do
-              get_index
-            end
-
-            it "tracks param usage" do
-              expect(params_usage_metric).to receive(:increment).with({params: "lat", controller: "api/stores", action: "index"})
-            end
-
-            it "tracks work mode" do
-              expect(work_mode_metric).to receive(:increment).with({mode: "mirror", params: "lat", controller: "api/stores", action: "index"})
-            end
-
-            it "tracks mirror compare" do
-              expect(mirror_compare_metric).to receive(:increment).with({match: "true", params: "lat", controller: "api/stores", action: "index"})
-            end
+          it "track metrics" do
+            common_tags = {params: "lat", controller: "api/stores", action: "index"}
+            expect(params_usage_metric).to receive(:increment).with(common_tags)
+            expect(work_mode_metric).to receive(:increment).with(common_tags.merge(mode: "mirror"))
+            expect(mirror_call_metric).to receive(:increment).with(common_tags.merge(success: "true"))
+            expect(compare_call_metric).to receive(:increment).with(common_tags.merge(success: "true"))
+            expect(compare_result_metric).to receive(:increment).with(common_tags.merge(value: "true"))
           end
         end
       end

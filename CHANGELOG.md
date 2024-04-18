@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - add support for mirror and replace modes
-- add config options: action.mirror, action.mirror_compare, configuration.flipper_actor
+- add config options: action.mirror, action.compare, configuration.flipper_actor
+- add to Mixin: #track_mirror_call, #track_compare_call, #track_compare_result
 
 ### Changed
 - rename Mixin#render_proxy_response to Mixin#render_origin_response

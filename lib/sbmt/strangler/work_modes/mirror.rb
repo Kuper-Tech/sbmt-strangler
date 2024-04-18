@@ -11,19 +11,23 @@ module Sbmt
           proxy_task = Concurrent::Promises.future { http_request(http_params) }
 
           mirror_result = mirror_task.value!
+          track_mirror_call(mirror_result.ok)
+
           origin_response = proxy_task.value!
 
-          mirror_compare(origin_response, mirror_result)
+          if mirror_result&.ok && origin_response.success?
+            compare_result = compare(origin_response, mirror_result)
+            track_compare_call(compare_result.ok)
+            track_compare_result(compare_result.value) if compare_result.ok
+          end
 
           render_origin_response(origin_response)
         end
 
         private
 
-        delegate(
-          :http_params, :http_request, :render_origin_response, :track_mirror_compare,
-          to: :rails_controller
-        )
+        delegate :http_params, :http_request, :render_origin_response, to: :rails_controller
+        delegate :track_mirror_call, :track_compare_call, :track_compare_result, to: :metric_tracker
 
         class Result < Struct.new(:ok, :value)
           def self.ok(value)
@@ -36,7 +40,8 @@ module Sbmt
         end
 
         def mirror
-          Result.ok(strangler_action.mirror.call(rails_controller))
+          value = strangler_action.mirror.call(rails_controller)
+          Result.ok(value)
         rescue => err
           handle_error(err)
           Result.failure
@@ -44,21 +49,18 @@ module Sbmt
 
         MATCH_ERROR = :error
 
-        def mirror_compare(origin_response, mirror_result)
-          match =
-            if mirror_result&.ok && origin_response.success?
-              begin
-                cmp = strangler_action.mirror_compare.call(origin_response.value![:body].dup, mirror_result.value)
-                raise "starngler_action.compare must return a boolean value!" unless cmp.in?([true, false])
-                cmp
-              rescue => err
-                handle_error(err)
-                MATCH_ERROR
-              end
-            else
-              MATCH_ERROR
-            end
-          track_mirror_compare(match)
+        def compare(origin_response, mirror_result)
+          cmp = strangler_action.compare.call(origin_response.value![:body].dup, mirror_result.value)
+          raise "Strangler action compare lambda must return a boolean value instead of #{cmp}!" unless cmp.in?([true, false])
+          Result.ok(cmp)
+        rescue => err
+          handle_error(err)
+          Result.failure
+        end
+
+        def handle_error(err)
+          Sbmt::Strangler.error_tracker.error(err)
+          Sbmt::Strangler.logger.error(err)
         end
       end
     end

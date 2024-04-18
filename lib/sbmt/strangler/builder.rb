@@ -20,6 +20,7 @@ module Sbmt
                   Sbmt::Strangler::ActionInvoker.new(
                     rails_controller: self,
                     strangler_action: action,
+                    metric_tracker: Sbmt::Strangler::MetricTracker.new(self),
                     feature_flags: Sbmt::Strangler::FeatureFlags.new(
                       rails_controller: self,
                       strangler_action: action

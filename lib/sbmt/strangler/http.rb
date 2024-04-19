@@ -12,7 +12,7 @@ module Sbmt
       DEFAULT_READ_TIMEOUT = 30
       DEFAULT_WRITE_TIMEOUT = 30
       DEFAULT_OPEN_TIMEOUT = 10
-      REQUEST_PATH_FILTER_REGEX = %r{(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})|(/\d+)|(/[A-Z]\d{11}(-\d{1})?)}
+      REQUEST_PATH_FILTER_REGEX = %r{(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})|(/\d+)|(/[A-Z]\d{9,11}(-\d{1})?)}
 
       # Configures Faraday connection. Sets default options and adds default middlewares into chain.
       # Accepts an optional block to configure net-http-persistent-adapter

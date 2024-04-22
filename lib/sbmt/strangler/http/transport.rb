@@ -27,7 +27,10 @@ module Sbmt
           @connection ||= Faraday.new do |conn|
             conn.response :raise_error
             Sbmt::Strangler::Http.configure_faraday(conn, name: "strangler_http_client")
-            conn.response :json
+            # Skip JSON parsing because
+            #   1. it speeds up proxy mode and
+            #   2. allows us to duplicate proxy response easily.
+            # conn.response :json
             conn.request :json
           end
         end

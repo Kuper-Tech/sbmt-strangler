@@ -45,9 +45,6 @@ VCR.configure do |c|
     match_requests_on: %i[method body uri],
     allow_unused_http_interactions: false
   }
-  c.before_playback(:with_parsed_json) do |interaction|
-    interaction.response.body = Oj.load(interaction.response.body)
-  end
 end
 
 RSpec.configure do |config|

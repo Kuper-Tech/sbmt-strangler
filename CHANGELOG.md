@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [0.?.?] - 2024-04-??
+## [0.3.0] - 2024-04-22
 
 ### Added
 - add support for mirror and replace modes
@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - rename Mixin#render_proxy_response to Mixin#render_origin_response
 - rename Mixin#track_work_tactic to Mixin#track_work_mode
+- Sbmt::Strangler::Http::Transport#get|post_request returns response body as String (it skips parsing body as JSON).
+
+### Fixed
+- Fix from v0.2.2 ported to v0.3.0
 
 ## [0.2.2] - 2024-04-19
 

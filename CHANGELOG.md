@@ -16,7 +16,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - rename Mixin#render_proxy_response to Mixin#render_origin_response
 - rename Mixin#track_work_tactic to Mixin#track_work_mode
 
+## [0.2.2] - 2024-04-19
+
 ### Fixed
+- filter out IDs like 'R608473650' from Faraday metric 'path' tag
 
 ## [0.2.0] - 2024-04-09
 

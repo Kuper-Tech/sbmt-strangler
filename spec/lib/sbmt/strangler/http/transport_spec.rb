@@ -8,7 +8,7 @@ RSpec.describe Sbmt::Strangler::Http::Transport do
     let(:response) { {"key" => "value"} }
 
     around do |example|
-      VCR.use_cassette("transport_get_success", tag: :with_parsed_json) do
+      VCR.use_cassette("transport_get_success") do
         example.run
       end
     end
@@ -17,7 +17,7 @@ RSpec.describe Sbmt::Strangler::Http::Transport do
       result = transport.get_request(url)
 
       expect(result).to be_success
-      expect(result.value![:body]).to eq(response)
+      expect(result.value![:body]).to eq(response.to_json)
       expect(result.value![:status]).to eq(200)
     end
   end
@@ -27,7 +27,7 @@ RSpec.describe Sbmt::Strangler::Http::Transport do
     let(:response) { {"key" => "value"} }
 
     around do |example|
-      VCR.use_cassette("transport_post_success", tag: :with_parsed_json) do
+      VCR.use_cassette("transport_post_success") do
         example.run
       end
     end
@@ -36,7 +36,7 @@ RSpec.describe Sbmt::Strangler::Http::Transport do
       result = transport.post_request(url)
 
       expect(result).to be_success
-      expect(result.value![:body]).to eq(response)
+      expect(result.value![:body]).to eq(response.to_json)
       expect(result.value![:status]).to eq(200)
     end
   end

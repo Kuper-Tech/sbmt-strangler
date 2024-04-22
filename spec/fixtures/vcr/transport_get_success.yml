@@ -7,8 +7,10 @@ http_interactions:
       status:
         code: 200
         message: OK
+      headers:
+        Content-Type: application/json; charset=utf-8
       body:
-        encoding: ASCII-8BIT
-        string: '{"key": "value"}'
+        encoding: UTF-8
+        string: '{"key":"value"}'
     recorded_at: Wed, 23 Aug 2023 18:19:32 GMT
 recorded_with: VCR 6.2.0

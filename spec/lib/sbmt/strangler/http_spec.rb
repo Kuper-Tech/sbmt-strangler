@@ -81,7 +81,9 @@ describe Sbmt::Strangler::Http do
     [
       SecureRandom.uuid,
       rand(1..1000).to_s,
-      "H01234567890-1"
+      "H01234567890-1",
+      "H01234567890",
+      "R608473650"
     ].each do |id|
       context "when id is #{id.inspect}" do
         it "works as a replacement pattern for id in the middle" do

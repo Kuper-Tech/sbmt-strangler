@@ -27,7 +27,7 @@ module Sbmt
       delegate :add, :enabled_for_actor?, :enabled_on_time?, to: "Sbmt::Strangler::Flipper"
 
       def feature_name(flag_name)
-        "#{strangler_action.controller.name}##{strangler_action.name}:#{flag_name}"
+        "#{strangler_action.full_name}:#{flag_name}"
       end
 
       def enabled?(feature_name)

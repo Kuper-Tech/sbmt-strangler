@@ -16,9 +16,11 @@ module Sbmt
         @name = name
         @controller = controller
 
-        Sbmt::Strangler::FeatureFlags.new(strangler_action: self).add_all!
-
         yield(self)
+      end
+
+      def full_name
+        "#{controller.name}##{name}"
       end
     end
   end

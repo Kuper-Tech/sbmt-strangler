@@ -5,7 +5,8 @@ module Sbmt
     class FeatureFlags
       FLAGS = %i[
         mirror
-      ] # TODO: add 'replace' feature flag
+        replace
+      ]
 
       attr_reader :strangler_action, :rails_controller
 

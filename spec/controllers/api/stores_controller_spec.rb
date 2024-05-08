@@ -126,7 +126,7 @@ describe Api::StoresController do
       end
     end
 
-    context "with replace mode", pending: "TODO: enable 'replace' mode" do
+    context "with replace mode" do
       include_context "with flipper enabled", "api/stores#index:replace"
 
       let(:params) { {} }

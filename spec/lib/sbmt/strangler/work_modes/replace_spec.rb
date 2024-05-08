@@ -14,7 +14,7 @@ describe Sbmt::Strangler::WorkModes::Replace do
     it "renders result of mirror block call" do
       expect(strangler_action.mirror).to receive(:call).with(rails_controller).and_call_original
       mode.call
-      expect(rails_controller).to have_received(:render).with(json: "mirror_result")
+      expect(rails_controller).to have_received(:render).with(mirror_result)
     end
 
     it "tracks mirror block call" do

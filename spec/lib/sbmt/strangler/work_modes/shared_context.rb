@@ -31,6 +31,6 @@ RSpec.shared_context "with work mode implemetation context" do
   let(:rails_controller) { instance_double(TestController, controller_path: "test", action_name: "index") }
   let(:feature_flags) { instance_double(Sbmt::Strangler::FeatureFlags) }
 
-  let(:mirror_result) { "mirror_result" }
+  let(:mirror_result) { {json: ["mirror_result"], status: :ok} }
   let(:compare_result) { true }
 end

@@ -9,7 +9,7 @@ module Sbmt
         def call
           mirror_result = strangler_action.mirror.call(rails_controller)
           track_mirror_call(true)
-          render json: mirror_result
+          render mirror_result
         end
 
         private

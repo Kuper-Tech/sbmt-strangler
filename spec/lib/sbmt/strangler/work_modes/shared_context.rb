@@ -1,4 +1,4 @@
-RSpec.shared_context "with work mode implemetation context" do
+RSpec.shared_context "with work mode implementation context" do
   subject(:mode) do
     described_class.new(
       rails_controller: rails_controller,
@@ -19,7 +19,7 @@ RSpec.shared_context "with work mode implemetation context" do
       cfg.controller "test" do |ctrl|
         ctrl.action "index" do |act|
           act.mirror = ->(_rails_controller) { mirror_result }
-          act.compare = ->(_origin_response_body, _mirror_result) { compare_result }
+          act.compare = ->(_origin_result, _mirror_result) { compare_result }
         end
       end
     end

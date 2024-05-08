@@ -4,7 +4,7 @@ require_relative "shared_context"
 
 describe Sbmt::Strangler::WorkModes::Replace do
   describe "#call" do
-    include_context "with work mode implemetation context"
+    include_context "with work mode implementation context"
 
     before do
       allow(metric_tracker).to receive(:track_mirror_call)

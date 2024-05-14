@@ -35,9 +35,9 @@ module Sbmt
         ::Yabeda.sbmt_strangler.compare_call.increment(yabeda_tags)
       end
 
-      def track_compare_result(value)
+      def track_compare_call_result(value)
         yabeda_tags = common_tags.merge(value: value.to_s)
-        ::Yabeda.sbmt_strangler.compare_result.increment(yabeda_tags)
+        ::Yabeda.sbmt_strangler.compare_call_result.increment(yabeda_tags)
       end
 
       private

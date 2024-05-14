@@ -9,9 +9,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - enable replace mode (it was temporarily commented out in the source code)
+- in the replace mode a value returned from action.mirror block is passed directly to the #render method
 
 ### Changed
-- assume that a value returned from action.mirror block can be passed directly to #render method
+- action.compare is called for failed origin/proxy responses too
+- the first argument of action.compare block (called origin_result) is a hash of the form {body:, status:, headers:}
+- metric renamed: sbmt_strangler_compare_result -> sbmt_strangler_compare_call_result
 
 ## [0.3.1] - 2024-04-24
 

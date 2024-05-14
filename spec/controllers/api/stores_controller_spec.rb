@@ -19,7 +19,7 @@ describe Api::StoresController do
 
       it "renders proxy response", vcr: "api/stores_post_success" do
         get_index
-        expect(response.body).to eq('["origin_response_body"]')
+        expect(response.body).to eq('["origin_result"]')
       end
 
       context "with metrics" do
@@ -179,7 +179,7 @@ describe Api::StoresController do
 
         it "renders proxy response" do
           get_index
-          expect(response.body).to eq('["origin_response_body"]')
+          expect(response.body).to eq('["origin_result"]')
         end
 
         context "with metrics" do
@@ -187,7 +187,7 @@ describe Api::StoresController do
           let(:work_mode_metric) { Yabeda.sbmt_strangler.work_mode }
           let(:mirror_call_metric) { Yabeda.sbmt_strangler.mirror_call }
           let(:compare_call_metric) { Yabeda.sbmt_strangler.compare_call }
-          let(:compare_result_metric) { Yabeda.sbmt_strangler.compare_result }
+          let(:compare_call_result_metric) { Yabeda.sbmt_strangler.compare_call_result }
           let(:params) { {a: 123, lat: 68.4897} }
 
           after do
@@ -200,7 +200,7 @@ describe Api::StoresController do
             expect(work_mode_metric).to receive(:increment).with(common_tags.merge(mode: "mirror"))
             expect(mirror_call_metric).to receive(:increment).with(common_tags.merge(success: "true"))
             expect(compare_call_metric).to receive(:increment).with(common_tags.merge(success: "true"))
-            expect(compare_result_metric).to receive(:increment).with(common_tags.merge(value: "true"))
+            expect(compare_call_result_metric).to receive(:increment).with(common_tags.merge(value: "true"))
           end
         end
       end

@@ -58,10 +58,10 @@ describe Sbmt::Strangler::MetricTracker do
     include_examples "increments Yabeda metric", :compare_call, {success: "true"}
   end
 
-  describe "#track_compare_result" do
-    subject(:call) { tracker.track_compare_result(false) }
+  describe "#track_compare_call_result" do
+    subject(:call) { tracker.track_compare_call_result(false) }
 
-    include_examples "increments Yabeda metric", :compare_result, {value: "false"}
+    include_examples "increments Yabeda metric", :compare_call_result, {value: "false"}
   end
 
   describe "#log_unallowed_params" do

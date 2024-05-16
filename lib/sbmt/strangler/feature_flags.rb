@@ -27,8 +27,14 @@ module Sbmt
 
       delegate :add, :enabled_for_actor?, :enabled_on_time?, to: "Sbmt::Strangler::Flipper"
 
+      FEATURE_NAME_SANITIZER = -> { _1.to_s.gsub(/[^A-Za-z0-9]+/, "-") }
+
       def feature_name(flag_name)
-        "#{strangler_action.full_name}:#{flag_name}"
+        sanitized_controller_name = FEATURE_NAME_SANITIZER.call(strangler_action.controller.name)
+        sanitized_action_name = FEATURE_NAME_SANITIZER.call(strangler_action.name)
+        sanitized_flag_name = FEATURE_NAME_SANITIZER.call(flag_name)
+
+        "#{sanitized_controller_name}__#{sanitized_action_name}--#{sanitized_flag_name}"
       end
 
       def enabled?(feature_name)

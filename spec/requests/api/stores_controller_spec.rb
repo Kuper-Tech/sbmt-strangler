@@ -35,7 +35,7 @@ describe Api::StoresController, swagger_doc: "api.yaml" do
           end
 
           context "when mirror mode enabled" do
-            include_context "with flipper enabled", "api/stores#index:mirror"
+            include_context "with flipper enabled", "api-stores__index--mirror"
 
             run_test! do
               expect(response.body).to eq('["origin_result"]')
@@ -44,7 +44,7 @@ describe Api::StoresController, swagger_doc: "api.yaml" do
         end
 
         context "when replace mode enabled" do
-          include_context "with flipper enabled", "api/stores#index:replace"
+          include_context "with flipper enabled", "api-stores__index--replace"
 
           run_test! do
             expect(response.body).to eq('["mirror_result"]')

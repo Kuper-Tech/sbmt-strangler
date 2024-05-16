@@ -5,13 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [0.4.0] - 2024-05-08
+## Unreleased
 
 ### Added
 - enable replace mode (it was temporarily commented out in the source code)
 - in the replace mode a value returned from action.mirror block is passed directly to the #render method
 
 ### Changed
+- automatic feature flags name now has BEM-like formatting: "controller-path__action-name--work-mode" (because of Flipper UI limitations/recomendations)
 - action.compare is called for failed origin/proxy responses too
 - the first argument of action.compare block (called origin_result) is a hash of the form {body:, status:, headers:}
 - metric renamed: sbmt_strangler_compare_result -> sbmt_strangler_compare_call_result

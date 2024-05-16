@@ -127,7 +127,7 @@ describe Api::StoresController do
     end
 
     context "with replace mode" do
-      include_context "with flipper enabled", "api/stores#index:replace"
+      include_context "with flipper enabled", "api-stores__index--replace"
 
       let(:params) { {} }
 
@@ -161,7 +161,7 @@ describe Api::StoresController do
     end
 
     context "with mirror mode" do
-      include_context "with flipper enabled", "api/stores#index:mirror"
+      include_context "with flipper enabled", "api-stores__index--mirror"
 
       let(:params) { {} }
 

@@ -20,8 +20,8 @@ describe Sbmt::Strangler::Builder do
 
     let(:expected_feature_names) do
       %w[
-        builder_test#index:mirror
-        builder_test#index:replace
+        builder-test__index--mirror
+        builder-test__index--replace
       ]
     end
 

@@ -8,7 +8,7 @@ module Sbmt
       option :params_tracking_allowlist, :headers_allowlist, default: []
       option :action_controller_base_class, default: "ActionController::Base"
       option :error_tracker, default: "Sbmt::Strangler::ErrorTracker"
-      option :flipper_actor
+      option :flipper_actor, default: ->(_http_params, _headers) {}
 
       attr_reader :controllers, :http
 

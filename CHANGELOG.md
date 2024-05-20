@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - enable replace mode (it was temporarily commented out in the source code)
 - in the replace mode a value returned from action.mirror block is passed directly to the #render method
+- action.flipper_actor lambda can now return an array of actor IDs instead of a single actor ID
 
 ### Changed
 - automatic feature flags name now has BEM-like formatting: "controller-path__action-name--work-mode" (because of Flipper UI limitations/recomendations)

@@ -16,7 +16,7 @@ module Sbmt
       end
 
       FLAGS.each do |flag_name|
-        define_method(:"#{flag_name}?") { enabled?(feature_name(flag_name)) }
+        define_method(:"#{flag_name}?") { feature_enabled?(feature_name(flag_name)) }
       end
 
       def add_all!
@@ -25,7 +25,7 @@ module Sbmt
 
       private
 
-      delegate :add, :enabled_for_actor?, :enabled_on_time?, to: "Sbmt::Strangler::Flipper"
+      delegate :add, :enabled?, :enabled_on_time?, to: "Sbmt::Strangler::Flipper"
 
       FEATURE_NAME_SANITIZER = -> { _1.to_s.gsub(/[^A-Za-z0-9]+/, "-") }
 
@@ -37,16 +37,12 @@ module Sbmt
         "#{sanitized_controller_name}__#{sanitized_action_name}--#{sanitized_flag_name}"
       end
 
-      def enabled?(feature_name)
-        enabled_for_actor?(feature_name, flipper_actor) || enabled_on_time?(feature_name)
+      def feature_enabled?(feature_name)
+        enabled?(feature_name, flipper_actor) || enabled_on_time?(feature_name)
       end
 
       def flipper_actor
-        @flipper_actor ||=
-          begin
-            actor = strangler_action.flipper_actor&.call(rails_controller.http_params, rails_controller.request.headers)
-            actor.presence || SecureRandom.uuid
-          end
+        @flipper_actor ||= strangler_action.flipper_actor.call(rails_controller.http_params, rails_controller.request.headers)
       end
     end
   end

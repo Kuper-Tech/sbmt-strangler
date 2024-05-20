@@ -9,15 +9,15 @@ module Sbmt
       class << self
         delegate :add, to: ::Flipper
 
-        def enabled_for_actor?(feature_name, actor)
-          return false if feature_name.blank?
-          return false if actor.blank?
+        def enabled?(feature_name, *actors)
+          raise "feature name is blank" if feature_name.blank?
 
-          ::Flipper.enabled?(feature_name, FLIPPER_ID_STRUCT.new(actor))
+          actors = Array(actors).flatten.compact
+          ::Flipper.enabled?(feature_name, *actors.map { FLIPPER_ID_STRUCT.new(_1) })
         end
 
         def enabled_on_time?(feature_name)
-          return false if feature_name.blank?
+          raise "feature name is blank" if feature_name.blank?
 
           hours_ranges =
             ::Flipper[feature_name]

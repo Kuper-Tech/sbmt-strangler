@@ -7,6 +7,15 @@ module Sbmt
         include Dry::Monads::Do
         include Dry::Monads::Result::Mixin
 
+        class << self
+          def persistent(host = nil)
+            return new unless host
+
+            name = "@persistent_#{host.gsub(/[.-]/, "_")}"
+            instance_variable_get(name) || instance_variable_set(name, new)
+          end
+        end
+
         def get_request(url, params: {}, headers: {})
           with_error_handling(url) do
             response = connection.get(url, params, headers)

@@ -7,7 +7,7 @@ RSpec.describe Sbmt::Strangler::Http::Client do
     let(:transport) { instance_double(Sbmt::Strangler::Http::Transport) }
 
     before do
-      allow(Sbmt::Strangler::Http::Transport).to receive(:new).and_return(transport)
+      allow(Sbmt::Strangler::Http::Transport).to receive(:persistent).and_return(transport)
     end
 
     context "with get request" do

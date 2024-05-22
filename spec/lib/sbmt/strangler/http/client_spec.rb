@@ -20,10 +20,10 @@ RSpec.describe Sbmt::Strangler::Http::Client do
       end
 
       context "with http headers" do
-        let(:headers) { {"HTTP_SBM_AUTH_IDENTITY" => "STF:uuid"} }
+        let(:headers) { {"HTTP_AUTH_IDENTITY" => "uuid"} }
 
         it "prepares headers" do
-          expect(transport).to receive(:get_request).with(url, params: {}, headers: {"SBM-AUTH-IDENTITY" => "STF:uuid"})
+          expect(transport).to receive(:get_request).with(url, params: {}, headers: {"AUTH-IDENTITY" => "uuid"})
 
           client.call(url, :get, payload: {}, headers: headers)
         end
@@ -40,10 +40,10 @@ RSpec.describe Sbmt::Strangler::Http::Client do
       end
 
       context "with http headers" do
-        let(:headers) { {"HTTP_SBM_AUTH_IDENTITY" => "STF:uuid"} }
+        let(:headers) { {"HTTP_AUTH_IDENTITY" => "uuid"} }
 
         it "prepares headers" do
-          expect(transport).to receive(:post_request).with(url, body: {}, headers: {"SBM-AUTH-IDENTITY" => "STF:uuid"})
+          expect(transport).to receive(:post_request).with(url, body: {}, headers: {"AUTH-IDENTITY" => "uuid"})
 
           client.call(url, :post, payload: {}, headers: headers)
         end

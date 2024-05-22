@@ -9,9 +9,9 @@ module Sbmt
         def call(url, http_verb, payload: {}, headers: {})
           case http_verb.downcase
           when :get
-            transport.get_request(url, params: payload, headers: prepare_headers(headers))
+            transport(url).get_request(url, params: payload, headers: prepare_headers(headers))
           when :post
-            transport.post_request(url, body: payload, headers: prepare_headers(headers))
+            transport(url).post_request(url, body: payload, headers: prepare_headers(headers))
           else
             raise "unsupported http verb - #{http_verb}"
           end
@@ -19,8 +19,8 @@ module Sbmt
 
         private
 
-        def transport
-          @transport ||= Sbmt::Strangler::Http::Transport.new
+        def transport(url)
+          @transport ||= Sbmt::Strangler::Http::Transport.persistent(URI(url).host)
         end
 
         def prepare_headers(headers)

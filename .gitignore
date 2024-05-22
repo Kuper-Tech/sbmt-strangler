@@ -14,3 +14,4 @@ lefthook-local.yml
 /.idea
 /.ruby-version
 /.ruby-gemset
+.DS_Store

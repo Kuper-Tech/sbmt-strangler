@@ -10,7 +10,7 @@ Sbmt::Strangler.configure do |strangler|
 
     controller.action("index") do |action|
       action.proxy_url = "http://example.com:8080/api/stores"
-      action.proxy_http_verb = :post
+      action.proxy_http_method = :post
       action.mirror = ->(_rails_controller) do
         {json: '["mirror_result"]', status: :ok}
       end
@@ -22,7 +22,6 @@ Sbmt::Strangler.configure do |strangler|
 
     controller.action("show") do |action|
       action.proxy_url = lambda { |params, _headers| "http://example.com:8080/api/stores/#{params[:id]}" }
-      action.proxy_http_verb = :get
       action.params_tracking_allowlist = %w[id]
     end
   end
@@ -30,7 +29,6 @@ Sbmt::Strangler.configure do |strangler|
   strangler.controller("api/orders/checkout") do |controller|
     controller.action("index") do |action|
       action.proxy_url = "http://example.com:8080/api/stores"
-      action.proxy_http_verb = :get
     end
   end
 end

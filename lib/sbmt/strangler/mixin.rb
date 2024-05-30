@@ -26,7 +26,7 @@ module Sbmt
       def http_request(payload)
         http_client.call(
           proxy_url,
-          strangler_action.proxy_http_verb,
+          strangler_action.proxy_http_method,
           payload: payload,
           headers: allowed_headers
         )

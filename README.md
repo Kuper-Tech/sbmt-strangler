@@ -35,7 +35,7 @@ To determine the proxy mode, you need to:
 
     controller.action("index") do |action|
       action.proxy_url = "http://example.com:8080/api/hello"
-      action.proxy_http_verb = :post
+      action.proxy_http_method = :post
     end
   end
  ```
@@ -58,7 +58,7 @@ Sbmt::Strangler.configure do |strangler|
 
     controller.action("index") do |action|
       action.proxy_url = "http://example.com:8080/api/hello"
-      action.proxy_http_verb = :post
+      action.proxy_http_method = :post
 
       # new implementation of legacy system business logic
       action.mirror = ->(rails_controller) do
@@ -84,4 +84,3 @@ end
 
 
 To enable replacement mode, use the feature flag. Replacement mode uses mirror lambda for replacement logic.
-

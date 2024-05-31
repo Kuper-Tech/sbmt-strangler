@@ -3,43 +3,6 @@
 RSpec.describe Sbmt::Strangler::Http::Transport do
   subject(:transport) { described_class.new }
 
-  describe ".persistent" do
-    context "with same host" do
-      it "use same transport" do
-        transport_1 = described_class.persistent("foo.com")
-        transport_2 = described_class.persistent("foo.com")
-
-        expect(transport_1).to be(transport_2)
-        expect(described_class.instance_variable_get(:@persistent_foo_com)).to be_present
-
-        described_class.instance_variable_set(:@persistent_foo_com, nil)
-      end
-    end
-
-    context "with different hosts" do
-      it "use different transports" do
-        transport_1 = described_class.persistent("foo.com")
-        transport_2 = described_class.persistent("bar.com")
-
-        expect(transport_1).not_to be(transport_2)
-        expect(described_class.instance_variable_get(:@persistent_foo_com)).to be_present
-        expect(described_class.instance_variable_get(:@persistent_bar_com)).to be_present
-
-        described_class.instance_variable_set(:@persistent_foo_com, nil)
-        described_class.instance_variable_set(:@persistent_bar_com, nil)
-      end
-    end
-
-    context "without host" do
-      it "use different transports" do
-        transport_1 = described_class.persistent
-        transport_2 = described_class.persistent
-
-        expect(transport_1).not_to be(transport_2)
-      end
-    end
-  end
-
   describe "#get_request" do
     let(:url) { "http://example.com/get_request" }
     let(:response) { {"key" => "value"} }

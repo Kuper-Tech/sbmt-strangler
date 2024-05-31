@@ -7,10 +7,10 @@ describe Sbmt::Strangler::Http do
     it "applies defaults" do
       conn = Faraday.new { |f| described_class.configure_faraday(f, name: "test-client") }
 
-      expect(conn.options.timeout).to eq(described_class::DEFAULT_TIMEOUT)
-      expect(conn.options.open_timeout).to eq(described_class::DEFAULT_OPEN_TIMEOUT)
-      expect(conn.options.read_timeout).to eq(described_class::DEFAULT_READ_TIMEOUT)
-      expect(conn.options.write_timeout).to eq(described_class::DEFAULT_WRITE_TIMEOUT)
+      expect(conn.options.timeout).to eq(Sbmt::Strangler.configuration.http.timeout)
+      expect(conn.options.open_timeout).to eq(Sbmt::Strangler.configuration.http.open_timeout)
+      expect(conn.options.read_timeout).to eq(Sbmt::Strangler.configuration.http.read_timeout)
+      expect(conn.options.write_timeout).to eq(Sbmt::Strangler.configuration.http.write_timeout)
       expect(conn.builder.adapter).to eq(Faraday::Adapter::NetHttpPersistent)
     end
 
@@ -39,40 +39,44 @@ describe Sbmt::Strangler::Http do
     end
 
     context "with custom http config" do
-      let(:http_keepalive_pool_size) { 100 }
-      let(:http_keepalive_idle_timeout) { 101 }
-      let(:http_timeout) { 102 }
-      let(:http_read_timeout) { 103 }
-      let(:http_write_timeout) { 104 }
-      let(:http_open_timeout) { 105 }
+      subject(:http_options) do
+        controller = Sbmt::Strangler.configuration.controllers.find { _1.name == controller_name }
+        controller.actions.find { _1.name == action_name }.http
+      end
 
-      before do
-        Sbmt::Strangler.configure do |strangler|
-          strangler.http.keepalive_pool_size = http_keepalive_pool_size
-          strangler.http.keepalive_idle_timeout = http_keepalive_idle_timeout
-          strangler.http.timeout = http_timeout
-          strangler.http.read_timeout = http_read_timeout
-          strangler.http.write_timeout = http_write_timeout
-          strangler.http.open_timeout = http_open_timeout
+      context "with global timeout configuration" do
+        let(:controller_name) { "api/stores" }
+        let(:action_name) { "global_timeout" }
+
+        it "uses global options" do
+          expect(http_options.timeout).to eq(10) # global configuration
+          expect(http_options.read_timeout).to eq(10) # global configuration
+          expect(http_options.write_timeout).to eq(10) # global configuration
+          expect(http_options.open_timeout).to eq(Sbmt::Strangler::Http::DEFAULT_HTTP_OPTIONS[:open_timeout])
         end
       end
 
-      after do
-        Sbmt::Strangler.configure do |strangler|
-          strangler.http.keepalive_pool_size = described_class::DEFAULT_KEEPALIVE_POOL_SIZE
-          strangler.http.keepalive_idle_timeout = described_class::DEFAULT_KEEPALIVE_IDLE_TIMEOUT
-          strangler.http.timeout = described_class::DEFAULT_TIMEOUT
-          strangler.http.read_timeout = described_class::DEFAULT_READ_TIMEOUT
-          strangler.http.write_timeout = described_class::DEFAULT_WRITE_TIMEOUT
-          strangler.http.open_timeout = described_class::DEFAULT_OPEN_TIMEOUT
+      context "with controller timeout configuration" do
+        let(:controller_name) { "api/timeout" }
+        let(:action_name) { "controller_timeout" }
+
+        it "uses controller options" do
+          expect(http_options.timeout).to eq(30) # controller configuration
+          expect(http_options.read_timeout).to eq(30) # controller configuration
+          expect(http_options.write_timeout).to eq(10) # global configuration
+          expect(http_options.open_timeout).to eq(Sbmt::Strangler::Http::DEFAULT_HTTP_OPTIONS[:open_timeout])
         end
-      end
 
-      it "overrides defaults" do
-        conn = Faraday.new { |f| described_class.configure_faraday(f, name: "test-client") }
+        context "with action timeout configuration" do
+          let(:action_name) { "action_timeout" }
 
-        expect(conn.options.timeout).to eq(http_timeout)
-        expect(conn.options.open_timeout).to eq(http_open_timeout)
+          it "uses action options" do
+            expect(http_options.timeout).to eq(60) # action configuration
+            expect(http_options.read_timeout).to eq(30) # controller configuration
+            expect(http_options.write_timeout).to eq(60) # action configuration
+            expect(http_options.open_timeout).to eq(Sbmt::Strangler::Http::DEFAULT_HTTP_OPTIONS[:open_timeout])
+          end
+        end
       end
     end
   end

@@ -23,6 +23,14 @@ module Sbmt
       def full_name
         "#{controller.name}##{name}"
       end
+
+      def http
+        @http ||= ActiveSupport::InheritableOptions.new(controller.http)
+      end
+
+      def http_client
+        @http_client ||= Sbmt::Strangler::Http::Client.new(http_options: http)
+      end
     end
   end
 end

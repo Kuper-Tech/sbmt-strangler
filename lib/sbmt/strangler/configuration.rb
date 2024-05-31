@@ -14,14 +14,7 @@ module Sbmt
 
       def initialize(options = {})
         @controllers = []
-        @http = ActiveSupport::OrderedOptions.new.tap do |c|
-          c.keepalive_pool_size = Sbmt::Strangler::Http::DEFAULT_KEEPALIVE_POOL_SIZE
-          c.keepalive_idle_timeout = Sbmt::Strangler::Http::DEFAULT_KEEPALIVE_IDLE_TIMEOUT
-          c.timeout = Sbmt::Strangler::Http::DEFAULT_TIMEOUT
-          c.read_timeout = Sbmt::Strangler::Http::DEFAULT_READ_TIMEOUT
-          c.write_timeout = Sbmt::Strangler::Http::DEFAULT_WRITE_TIMEOUT
-          c.open_timeout = Sbmt::Strangler::Http::DEFAULT_OPEN_TIMEOUT
-        end
+        @http = ActiveSupport::InheritableOptions.new(Sbmt::Strangler::Http::DEFAULT_HTTP_OPTIONS)
       end
 
       def controller(name, &)

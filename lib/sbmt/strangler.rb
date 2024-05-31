@@ -27,6 +27,7 @@ rescue LoadError
 end
 
 require_relative "strangler/configurable"
+require_relative "strangler/http"
 require_relative "strangler/action"
 require_relative "strangler/controller"
 require_relative "strangler/configuration"
@@ -37,7 +38,6 @@ require_relative "strangler/const_definer"
 require_relative "strangler/errors"
 require_relative "strangler/error_tracker"
 require_relative "strangler/logger"
-require_relative "strangler/http"
 require_relative "strangler/flipper"
 require_relative "strangler/feature_flags"
 require_relative "strangler/metric_tracker"

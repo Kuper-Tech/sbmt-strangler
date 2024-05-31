@@ -24,7 +24,7 @@ module Sbmt
       end
 
       def http_request(payload)
-        http_client.call(
+        strangler_action.http_client.call(
           proxy_url,
           strangler_action.proxy_http_method,
           payload: payload,
@@ -39,10 +39,6 @@ module Sbmt
         in Proc => proc
           proc.call(http_params, request.headers)
         end
-      end
-
-      def http_client
-        @http_client ||= Sbmt::Strangler::Http::Client.new
       end
 
       def render_origin_response(response)

@@ -6,12 +6,14 @@ require_relative "http/transport"
 module Sbmt
   module Strangler
     module Http
-      DEFAULT_KEEPALIVE_POOL_SIZE = 20
-      DEFAULT_KEEPALIVE_IDLE_TIMEOUT = 90
-      DEFAULT_TIMEOUT = 30
-      DEFAULT_READ_TIMEOUT = 30
-      DEFAULT_WRITE_TIMEOUT = 30
-      DEFAULT_OPEN_TIMEOUT = 10
+      DEFAULT_HTTP_OPTIONS = {
+        keepalive_pool_size: 256,
+        keepalive_idle_timeout: 30,
+        timeout: 5,
+        read_timeout: 5,
+        write_timeout: 5,
+        open_timeout: 1
+      }.freeze
       REQUEST_PATH_FILTER_REGEX = %r{(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})|(/\d+)|(/[A-Z]\d{9,11}(-\d{1})?)}
 
       # Configures Faraday connection. Sets default options and adds default middlewares into chain.
@@ -31,6 +33,7 @@ module Sbmt
       # @param [Hash] opts faraday & middlewares options
       # @option opts [String] :name client name for tracing and instrumentation. Required.
       # @option opts [Hash] :adapter_opts net_http_persistent adapter options
+      # @option opts [ActiveSupport::InheritableOptions] :http_options timeout options
       # @option opts [Regexp] :request_path_filter_regex (REQUEST_PATH_FILTER_REGEX) regex for filtering out
       #                       variables from http request metric `path` tag. Set to false to add empty value instead.
       #
@@ -38,7 +41,7 @@ module Sbmt
       def self.configure_faraday(conn, opts = {})
         raise ConfigurationError, "Faraday client :name must be set" unless opts[:name]
 
-        http_options = Sbmt::Strangler.configuration.http
+        http_options = opts[:http_options] || Sbmt::Strangler.configuration.http
 
         conn.options.timeout = http_options.timeout
         conn.options.read_timeout = http_options.read_timeout

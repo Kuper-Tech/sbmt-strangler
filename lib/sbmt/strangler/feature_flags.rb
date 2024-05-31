@@ -7,6 +7,7 @@ module Sbmt
         mirror
         replace
       ]
+      FEATURES_HEADER_NAME = "HTTP_STRANGLER_FEATURES"
 
       attr_reader :strangler_action, :rails_controller
 
@@ -38,11 +39,20 @@ module Sbmt
       end
 
       def feature_enabled?(feature_name)
-        enabled?(feature_name, flipper_actor) || enabled_on_time?(feature_name)
+        enabled?(feature_name, flipper_actor) ||
+          enabled_on_time?(feature_name) ||
+          enabled_by_header?(feature_name)
       end
 
       def flipper_actor
         @flipper_actor ||= strangler_action.flipper_actor.call(rails_controller.http_params, rails_controller.request.headers)
+      end
+
+      def enabled_by_header?(feature_name)
+        features = rails_controller.request.headers[FEATURES_HEADER_NAME]
+        return false unless features.present? && features.is_a?(String)
+
+        features.split(",").map(&:strip).include?(feature_name)
       end
     end
   end

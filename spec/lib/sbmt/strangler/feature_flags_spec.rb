@@ -31,7 +31,7 @@ describe Sbmt::Strangler::FeatureFlags do
 
   let(:ctrl_http_params) { instance_double(Hash) }
   let(:ctrl_request) { instance_double(ActionDispatch::Request, headers: ctrl_request_headers) }
-  let(:ctrl_request_headers) { instance_double(ActionDispatch::Http::Headers) }
+  let(:ctrl_request_headers) { ActionDispatch::Http::Headers.from_hash({}) }
 
   before do
     allow(strangler_action.flipper_actor).to receive(:call).with(ctrl_http_params, ctrl_request_headers).and_call_original
@@ -127,6 +127,56 @@ describe Sbmt::Strangler::FeatureFlags do
     end
   end
 
+  shared_examples "with enabling feature by request headers" do
+    context "when the header is not sent" do
+      it("returns false") { expect(result).to be(false) }
+    end
+
+    context "when the invalid header is sent" do
+      context "with many values" do
+        let(:ctrl_request_headers) do
+          ActionDispatch::Http::Headers.from_hash(
+            "#{described_class::FEATURES_HEADER_NAME}" => "any_other_header, invalid_#{expected_feature_name}"
+          )
+        end
+
+        it("returns false") { expect(result).to be(false) }
+      end
+
+      context "with one value" do
+        let(:ctrl_request_headers) do
+          ActionDispatch::Http::Headers.from_hash(
+            "#{described_class::FEATURES_HEADER_NAME}" => "invalid_#{expected_feature_name}"
+          )
+        end
+
+        it("returns false") { expect(result).to be(false) }
+      end
+    end
+
+    context "when the valid header is sent" do
+      context "with many values" do
+        let(:ctrl_request_headers) do
+          ActionDispatch::Http::Headers.from_hash(
+            "#{described_class::FEATURES_HEADER_NAME}" => "any_other_header, #{expected_feature_name}"
+          )
+        end
+
+        it("returns true") { expect(result).to be(true) }
+      end
+
+      context "with string value" do
+        let(:ctrl_request_headers) do
+          ActionDispatch::Http::Headers.from_hash(
+            "#{described_class::FEATURES_HEADER_NAME}" => "#{expected_feature_name}"
+          )
+        end
+
+        it("returns true") { expect(result).to be(true) }
+      end
+    end
+  end
+
   describe "#mirror?" do
     subject(:result) { feature_flags.mirror? }
 
@@ -135,6 +185,7 @@ describe Sbmt::Strangler::FeatureFlags do
     include_context "with actor"
     include_context "without actor"
     include_context "with multiple actors"
+    include_context "with enabling feature by request headers"
   end
 
   describe "#replace?" do
@@ -145,6 +196,7 @@ describe Sbmt::Strangler::FeatureFlags do
     include_context "with actor"
     include_context "without actor"
     include_context "with multiple actors"
+    include_context "with enabling feature by request headers"
   end
 
   describe "::add_all!" do

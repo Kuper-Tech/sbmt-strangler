@@ -1,6 +1,6 @@
 services:
   ruby:
-    image: ruby:${RUBY_VERSION:-3.2}
+    image: ${RUBY_DOCKER_IMAGE:-ruby}:${RUBY_VERSION:-3.3}
     environment:
       HISTFILE: /app/tmp/.bash_history
       BUNDLE_PATH: /usr/local/bundle
@@ -10,7 +10,7 @@ services:
     working_dir: /app
     volumes:
       - .:/app:cached
-      - ${SBMT_RUBYGEMS_PATH:-..}:/app/vendor/gems:cached
+      - ${RUBYGEMS_PATH:-..}:/app/vendor/gems:cached
       - bundler_data:/usr/local/bundle
     tmpfs:
       - /tmp

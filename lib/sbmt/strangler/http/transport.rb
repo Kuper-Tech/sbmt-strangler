@@ -7,13 +7,8 @@ module Sbmt
         include Dry::Monads::Do
         include Dry::Monads::Result::Mixin
 
-        class << self
-          def persistent(host = nil)
-            return new unless host
-
-            name = "@persistent_#{host.gsub(/[.-]/, "_")}"
-            instance_variable_get(name) || instance_variable_set(name, new)
-          end
+        def initialize(http_options: nil)
+          @http_options = http_options
         end
 
         def get_request(url, params: {}, headers: {})
@@ -32,10 +27,12 @@ module Sbmt
 
         private
 
+        attr_reader :http_options
+
         def connection
           @connection ||= Faraday.new do |conn|
             conn.response :raise_error
-            Sbmt::Strangler::Http.configure_faraday(conn, name: "strangler_http_client")
+            Sbmt::Strangler::Http.configure_faraday(conn, name: "strangler_http_client", http_options: http_options)
             # Skip JSON parsing because
             #   1. it speeds up proxy mode and
             #   2. allows us to duplicate proxy response easily.

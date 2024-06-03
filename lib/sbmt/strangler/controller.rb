@@ -21,6 +21,10 @@ module Sbmt
       def action(name, &)
         @actions.push(Sbmt::Strangler::Action.new(name, self, &))
       end
+
+      def http
+        @http ||= ActiveSupport::InheritableOptions.new(configuration.http)
+      end
     end
   end
 end

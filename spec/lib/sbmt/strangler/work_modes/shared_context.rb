@@ -20,6 +20,7 @@ RSpec.shared_context "with work mode implementation context" do
         ctrl.action "index" do |act|
           act.mirror = ->(_rails_controller) { mirror_result }
           act.compare = ->(_origin_result, _mirror_result) { compare_result }
+          act.render = ->(_mirror_result) { render_result }
         end
       end
     end
@@ -31,6 +32,7 @@ RSpec.shared_context "with work mode implementation context" do
   let(:rails_controller) { instance_double(TestController, controller_path: "test", action_name: "index") }
   let(:feature_flags) { instance_double(Sbmt::Strangler::FeatureFlags) }
 
-  let(:mirror_result) { {json: ["mirror_result"], status: :ok} }
+  let(:mirror_result) { ["mirror_result"] }
   let(:compare_result) { true }
+  let(:render_result) { {json: '["mirror_result"]', status: :ok} }
 end

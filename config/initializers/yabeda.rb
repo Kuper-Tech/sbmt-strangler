@@ -29,6 +29,9 @@ module Sbmt
             counter :compare_call_result,
               comment: "Compare lambda call result counter (value: true, false)",
               tags: %i[value params controller action]
+            counter :render_call,
+              comment: "Render lambda call counter (success: true, false)",
+              tags: %i[success params controller action]
           end
         end
       end

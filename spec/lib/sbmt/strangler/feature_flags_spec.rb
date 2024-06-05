@@ -136,7 +136,7 @@ describe Sbmt::Strangler::FeatureFlags do
       context "with many values" do
         let(:ctrl_request_headers) do
           ActionDispatch::Http::Headers.from_hash(
-            "#{described_class::FEATURES_HEADER_NAME}" => "any_other_header, invalid_#{expected_feature_name}"
+            described_class::FEATURES_HEADER_NAME.to_s => "any_other_header, invalid_#{expected_feature_name}"
           )
         end
 
@@ -146,7 +146,7 @@ describe Sbmt::Strangler::FeatureFlags do
       context "with one value" do
         let(:ctrl_request_headers) do
           ActionDispatch::Http::Headers.from_hash(
-            "#{described_class::FEATURES_HEADER_NAME}" => "invalid_#{expected_feature_name}"
+            described_class::FEATURES_HEADER_NAME.to_s => "invalid_#{expected_feature_name}"
           )
         end
 
@@ -158,7 +158,7 @@ describe Sbmt::Strangler::FeatureFlags do
       context "with many values" do
         let(:ctrl_request_headers) do
           ActionDispatch::Http::Headers.from_hash(
-            "#{described_class::FEATURES_HEADER_NAME}" => "any_other_header, #{expected_feature_name}"
+            described_class::FEATURES_HEADER_NAME.to_s => "any_other_header, #{expected_feature_name}"
           )
         end
 
@@ -168,7 +168,7 @@ describe Sbmt::Strangler::FeatureFlags do
       context "with string value" do
         let(:ctrl_request_headers) do
           ActionDispatch::Http::Headers.from_hash(
-            "#{described_class::FEATURES_HEADER_NAME}" => "#{expected_feature_name}"
+            described_class::FEATURES_HEADER_NAME.to_s => expected_feature_name.to_s
           )
         end
 

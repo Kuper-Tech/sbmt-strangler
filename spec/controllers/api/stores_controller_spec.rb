@@ -145,6 +145,7 @@ describe Api::StoresController do
         let(:params_usage_metric) { Yabeda.sbmt_strangler.params_usage }
         let(:work_mode_metric) { Yabeda.sbmt_strangler.work_mode }
         let(:mirror_call_metric) { Yabeda.sbmt_strangler.mirror_call }
+        let(:render_call_metric) { Yabeda.sbmt_strangler.render_call }
         let(:params) { {a: 123, lat: 68.4897} }
 
         after do
@@ -156,6 +157,7 @@ describe Api::StoresController do
           expect(params_usage_metric).to receive(:increment).with(common_tags)
           expect(work_mode_metric).to receive(:increment).with(common_tags.merge(mode: "replace"))
           expect(mirror_call_metric).to receive(:increment).with(common_tags.merge(success: "true"))
+          expect(render_call_metric).to receive(:increment).with(common_tags.merge(success: "true"))
         end
       end
     end

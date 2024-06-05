@@ -13,11 +13,14 @@ Sbmt::Strangler.configure do |strangler|
       action.proxy_url = "http://example.com:8080/api/stores"
       action.proxy_http_method = :post
       action.mirror = ->(_rails_controller) do
-        {json: '["mirror_result"]', status: :ok}
+        ["mirror_result"]
       end
       action.compare = ->(origin_result, mirror_result) do
-        mirror_result[:json] == '["mirror_result"]' &&
+        mirror_result == ["mirror_result"] &&
           origin_result[:body] == '["origin_result"]'
+      end
+      action.render = ->(mirror_result) do
+        {json: mirror_result.to_json, status: :ok}
       end
     end
 

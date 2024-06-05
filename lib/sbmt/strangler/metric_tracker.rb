@@ -40,6 +40,11 @@ module Sbmt
         ::Yabeda.sbmt_strangler.compare_call_result.increment(yabeda_tags)
       end
 
+      def track_render_call(success)
+        yabeda_tags = common_tags.merge(success: success.to_s)
+        ::Yabeda.sbmt_strangler.render_call.increment(yabeda_tags)
+      end
+
       private
 
       delegate :http_params, :allowed_params, :controller_path, :action_name, to: :rails_controller

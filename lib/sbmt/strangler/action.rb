@@ -10,6 +10,7 @@ module Sbmt
       option :proxy_http_method, default: :get
       option :mirror, default: ->(_rails_controller) {}
       option :compare, default: ->(_origin_result, _mirror_result) { false }
+      option :render, default: ->(mirror_result) { mirror_result }
 
       attr_reader :name, :controller
 

@@ -64,6 +64,12 @@ describe Sbmt::Strangler::MetricTracker do
     include_examples "increments Yabeda metric", :compare_call_result, {value: "false"}
   end
 
+  describe "#track_render_call" do
+    subject(:call) { tracker.track_render_call(true) }
+
+    include_examples "increments Yabeda metric", :render_call, {success: "true"}
+  end
+
   describe "#log_unallowed_params" do
     it "logs unallowed params" do
       expect(Sbmt::Strangler.logger).to receive(:log_warn).with(<<~WARN.strip).and_call_original

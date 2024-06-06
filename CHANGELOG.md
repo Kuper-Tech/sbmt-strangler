@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.9.0] - 2024-06-06
+
+### Added
+- Add handler for Faraday::ConnectionFailed
+- Add retry connection support
+
 ## [0.8.0] - 2024-06-05
 
 ### Added

@@ -12,7 +12,8 @@ module Sbmt
         timeout: 5,
         read_timeout: 5,
         write_timeout: 5,
-        open_timeout: 1
+        open_timeout: 1,
+        retries_count: 1
       }.freeze
       REQUEST_PATH_FILTER_REGEX = %r{(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})|(/\d+)|(/[A-Z]\d{9,11}(-\d{1})?)}
 

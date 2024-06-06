@@ -42,7 +42,20 @@ module Sbmt
         end
 
         def with_error_handling(url)
+          retry_count ||= 0
+
           yield
+        rescue Faraday::ConnectionFailed => error
+          Sbmt::Strangler.logger.error(
+            message: "Sbmt::Strangler::Http::Transport ConnectionFailed",
+            url: url,
+            attempt: retry_count + 1,
+            retries_count: http_options.retries_count
+          )
+
+          retry if (retry_count += 1) && retry_count <= http_options.retries_count
+  
+          Failure(status: :bad_gateway)
         rescue Faraday::UnprocessableEntityError, Faraday::ForbiddenError => error
           Failure(body: error.response_body, status: error.response_status, headers: error.response_headers)
         rescue Faraday::TimeoutError

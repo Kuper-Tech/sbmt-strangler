@@ -16,6 +16,9 @@ module Sbmt
             transport.get_request(url, params: payload, headers: prepare_headers(headers))
           when :post
             transport.post_request(url, body: payload, headers: prepare_headers(headers))
+          when :put
+            transport.put_request(url, body: payload, headers: prepare_headers(headers))
+
           else
             raise "unsupported http verb - #{http_verb}"
           end

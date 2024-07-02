@@ -49,5 +49,25 @@ RSpec.describe Sbmt::Strangler::Http::Client do
         end
       end
     end
+
+    context "with put request" do
+      let(:url) { "http://example.com/put_request" }
+
+      it "does put_request" do
+        expect(transport).to receive(:put_request).with(url, body: {}, headers: {})
+
+        client.call(url, :put, payload: {})
+      end
+
+      context "with http headers" do
+        let(:headers) { {"HTTP_AUTH_IDENTITY" => "uuid"} }
+
+        it "prepares headers" do
+          expect(transport).to receive(:put_request).with(url, body: {}, headers: {"AUTH-IDENTITY" => "uuid"})
+
+          client.call(url, :put, payload: {}, headers: headers)
+        end
+      end
+    end
   end
 end

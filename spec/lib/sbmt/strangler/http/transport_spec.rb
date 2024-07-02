@@ -41,6 +41,25 @@ RSpec.describe Sbmt::Strangler::Http::Transport do
     end
   end
 
+  describe "#put_request" do
+    let(:url) { "http://example.com/put_request" }
+    let(:response) { {"key" => "value"} }
+
+    around do |example|
+      VCR.use_cassette("transport_put_success") do
+        example.run
+      end
+    end
+
+    it "does put_request" do
+      result = transport.put_request(url)
+
+      expect(result).to be_success
+      expect(result.value![:body]).to eq(response.to_json)
+      expect(result.value![:status]).to eq(200)
+    end
+  end
+
   context "when TimeoutError" do
     let(:connection) { instance_double(Faraday::Connection) }
     let(:error_class) do

@@ -25,6 +25,13 @@ module Sbmt
           end
         end
 
+        def put_request(url, body: {}, headers: {})
+          with_error_handling(url) do
+            response = connection.put(url, body, headers)
+            Success(body: response.body, status: response.status, headers: response.headers)
+          end
+        end
+
         private
 
         attr_reader :http_options
@@ -54,7 +61,7 @@ module Sbmt
           )
 
           retry if (retry_count += 1) && retry_count <= http_options.retries_count
-  
+
           Failure(status: :bad_gateway)
         rescue Faraday::UnprocessableEntityError, Faraday::ForbiddenError => error
           Failure(body: error.response_body, status: error.response_status, headers: error.response_headers)

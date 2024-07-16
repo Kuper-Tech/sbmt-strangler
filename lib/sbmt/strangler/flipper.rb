@@ -30,7 +30,13 @@ module Sbmt
               .compact
 
           hour_now = DateTime.now.in_time_zone.hour
-          hours_ranges.any? { |range| (range.first..range.last).cover?(hour_now) }
+          hours_ranges.any? do |range|
+            return (range.first...range.last).cover?(hour_now) if range.last > range.first
+
+            range_last = range.last + 24
+            (range.first...range_last).cover?(hour_now + 24) ||
+              (range.first...range_last).cover?(hour_now)
+          end
         end
       end
     end

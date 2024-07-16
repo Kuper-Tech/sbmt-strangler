@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 describe Sbmt::Strangler::Flipper do
+  include ActiveSupport::Testing::TimeHelpers
+
   describe ".add" do
     it "is delegated to ::Flipper" do
       expect(::Flipper).to receive(:add).with("feature_name").and_call_original
@@ -93,26 +95,90 @@ describe Sbmt::Strangler::Flipper do
 
     let(:feature_name) { "feature_name" }
 
-    it("returns false") { expect(result).to be(false) }
-
     context "when feature enabled for current hour" do
-      let(:enabled_hour) { Time.current.hour }
+      around { |ex| travel_to(time_now, &ex) }
 
       before do
-        hours_range = "ONTIME:%02d-%02d" % [[enabled_hour - 1, 0].max, [enabled_hour + 1, 23].min]
+        hours_range = "ONTIME:#{start_hour}-#{end_hour}"
         ::Flipper.enable(feature_name, Sbmt::Strangler::Flipper::FLIPPER_ID_STRUCT.new(hours_range))
       end
 
-      after do
-        ::Flipper.disable(feature_name)
-      end
+      after { ::Flipper.disable(feature_name) }
 
-      it("returns true") { expect(result).to be(true) }
+      let(:start_hour) { "18" }
+      let(:end_hour) { "23" }
 
-      context "when fetaure enabled for another hours range" do
-        let(:enabled_hour) { (Time.current.hour > 12) ? 3 : 15 }
+      context "when feature enabled for another hours range" do
+        let(:time_now) { DateTime.now.change(hour: 7) }
 
         it("returns false") { expect(result).to be(false) }
+      end
+
+      context "when feature enabled for correct hours range" do
+        let(:time_now) { DateTime.now.change(hour: 20) }
+
+        it("returns true") { expect(result).to be(true) }
+      end
+
+      context "when feature enabled for end_hour" do
+        let(:time_now) { DateTime.now.change(hour: 23, minutes: 10) }
+
+        it("returns false") { expect(result).to be(false) }
+      end
+
+      context "when feature enabled for start_hour" do
+        let(:time_now) { DateTime.now.change(hour: 18, minutes: 10) }
+
+        it("returns true") { expect(result).to be(true) }
+      end
+
+      context "when start_hour eq end_hour" do
+        let(:start_hour) { "02" }
+        let(:end_hour) { "02" }
+        let(:time_now) { DateTime.now.change(hour: 12) }
+
+        it("returns true") { expect(result).to be(true) }
+      end
+
+      context "when feature enabled and goes through for 00 hours range?" do
+        let(:start_hour) { "18" }
+        let(:end_hour) { "05" }
+
+        context "when result is false" do
+          context "when time before start_hour" do
+            let(:time_now) { DateTime.now.change(hour: 16) }
+
+            it("returns false") { expect(result).to be(false) }
+          end
+
+          context "when time after end_hour" do
+            let(:time_now) { DateTime.now.change(hour: 7) }
+
+            it("returns false") { expect(result).to be(false) }
+          end
+
+          context "when start and end hours close" do
+            let(:start_hour) { "03" }
+            let(:end_hour) { "02" }
+            let(:time_now) { DateTime.now.change(hour: 2, minutes: 10) }
+
+            it("returns false") { expect(result).to be(false) }
+          end
+        end
+
+        context "when result is true" do
+          let(:time_now) { DateTime.now.change(hour: 20) }
+
+          it("returns true") { expect(result).to be(true) }
+
+          context "when start and end hours close" do
+            let(:start_hour) { "03" }
+            let(:end_hour) { "02" }
+            let(:time_now) { DateTime.now.change(hour: 3, minutes: 10) }
+
+            it("returns true") { expect(result).to be(true) }
+          end
+        end
       end
     end
 

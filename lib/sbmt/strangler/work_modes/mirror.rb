@@ -45,7 +45,12 @@ module Sbmt
         end
 
         def mirror_call
-          value = strangler_action.mirror.call(rails_controller)
+          value = if strangler_action.composition?
+            strangler_action.composition.call(rails_controller)
+          else
+            strangler_action.mirror.call(rails_controller)
+          end
+
           Success(value)
         rescue => err
           handle_error(err)

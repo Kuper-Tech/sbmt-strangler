@@ -32,6 +32,67 @@ Sbmt::Strangler.configure do |strangler|
     controller.action("global_timeout") do |action|
       action.proxy_url = "http://example.com:8080/api/stores"
     end
+
+    controller.action("index_composition_nested") do |action|
+      action.proxy_url = "http://example.com:8080/api/stores"
+      action.proxy_http_method = :post
+      action.compare = ->(origin_result, mirror_result) do
+        mirror_result == ["mirror_result"] &&
+          origin_result[:body] == '["origin_result"]'
+      end
+      action.render = ->(mirror_result) do
+        {json: mirror_result.to_json, status: :ok}
+      end
+
+      action.composition do |composition|
+        composition
+          .sync(:service_a)
+          .process { |rails_controller| "service_a_response" }
+          .with_composition do |step_composition|
+          step_composition
+            .async(:service_b)
+            .process { |rails_controller, responses| "#{responses[:service_a]}_service_b_response" }
+
+          step_composition
+            .async(:service_c)
+            .process { |rails_controller, responses| "#{responses[:service_a]}_service_c_response" }
+
+          step_composition.compose do |responses|
+            [responses[:service_a], responses[:service_b], responses[:service_c]]
+          end
+        end
+
+        composition.compose do |responses|
+          responses[:service_a].join(",")
+        end
+      end
+    end
+
+    controller.action("index_composition_async") do |action|
+      action.proxy_url = "http://example.com:8080/api/stores"
+      action.proxy_http_method = :post
+      action.compare = ->(origin_result, mirror_result) do
+        mirror_result == ["mirror_result"] &&
+          origin_result[:body] == '["origin_result"]'
+      end
+      action.render = ->(mirror_result) do
+        {json: mirror_result.to_json, status: :ok}
+      end
+
+      action.composition do |composition|
+        composition
+          .async(:service_a)
+          .process { |rails_controller| "service_a_response" }
+
+        composition
+          .async(:service_b)
+          .process { |rails_controller| "service_b_response" }
+
+        composition.compose do |responses|
+          [responses[:service_a], responses[:service_b]].join(",")
+        end
+      end
+    end
   end
 
   strangler.controller("api/orders/checkout") do |controller|

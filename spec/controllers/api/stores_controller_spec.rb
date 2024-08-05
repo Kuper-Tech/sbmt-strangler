@@ -225,4 +225,132 @@ describe Api::StoresController do
       end
     end
   end
+
+  describe "GET index_composition_nested" do
+    subject(:get_index) { get(:index_composition_nested, params: params) }
+
+    context "with proxy mode" do
+      let(:params) {
+        {
+          lat: 5,
+          lon: 5
+        }
+      }
+
+      it "returns 200 code", vcr: "api/stores_post_success" do
+        get_index
+        expect(response).to have_http_status(:success)
+      end
+
+      it "renders proxy response", vcr: "api/stores_post_success" do
+        get_index
+        expect(response.body).to eq('["origin_result"]')
+      end
+    end
+
+    context "with replace mode" do
+      include_context "with flipper enabled", "api-stores__index-composition-nested--replace"
+
+      let(:params) { {} }
+
+      it "returns 200 code" do
+        get_index
+        expect(response).to have_http_status(:success)
+      end
+
+      it "renders from service" do
+        get_index
+        expect(response.body)
+          .to eq("service_a_response,service_a_response_service_b_response,service_a_response_service_c_response".to_json)
+      end
+    end
+
+    context "with mirror mode" do
+      include_context "with flipper enabled", "api-stores__index-composition-nested--mirror"
+
+      let(:params) { {} }
+
+      context "when proxied server responded successfully" do
+        around do |example|
+          VCR.use_cassette("api/stores_post_success", match_requests_on: %i[method]) do
+            example.run
+          end
+        end
+
+        it "returns 200 code" do
+          get_index
+          expect(response).to have_http_status(:success)
+        end
+
+        it "renders proxy response" do
+          get_index
+          expect(response.body).to eq('["origin_result"]')
+        end
+      end
+    end
+  end
+
+  describe "GET index_composition_async" do
+    subject(:get_index) { get(:index_composition_async, params: params) }
+
+    context "with proxy mode" do
+      let(:params) {
+        {
+          lat: 5,
+          lon: 5
+        }
+      }
+
+      it "returns 200 code", vcr: "api/stores_post_success" do
+        get_index
+        expect(response).to have_http_status(:success)
+      end
+
+      it "renders proxy response", vcr: "api/stores_post_success" do
+        get_index
+        expect(response.body).to eq('["origin_result"]')
+      end
+    end
+
+    context "with replace mode" do
+      include_context "with flipper enabled", "api-stores__index-composition-async--replace"
+
+      let(:params) { {} }
+
+      it "returns 200 code" do
+        get_index
+        expect(response).to have_http_status(:success)
+      end
+
+      it "renders from service" do
+        get_index
+        expect(response.body)
+          .to eq("service_a_response,service_b_response".to_json)
+      end
+    end
+
+    context "with mirror mode" do
+      include_context "with flipper enabled", "api-stores__index-composition-async--mirror"
+
+      let(:params) { {} }
+
+      context "when proxied server responded successfully" do
+        around do |example|
+          VCR.use_cassette("api/stores_post_success", match_requests_on: %i[method]) do
+            example.run
+          end
+        end
+
+        it "returns 200 code" do
+          get_index
+          expect(response).to have_http_status(:success)
+        end
+
+        it "renders proxy response" do
+          get_index
+          expect(response.body).to eq('["origin_result"]')
+        end
+      end
+    end
+  end
 end

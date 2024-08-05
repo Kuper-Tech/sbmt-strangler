@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "action/composition"
+
 module Sbmt
   module Strangler
     class Action
@@ -31,6 +33,16 @@ module Sbmt
 
       def http_client
         @http_client ||= Sbmt::Strangler::Http::Client.new(http_options: http)
+      end
+
+      def composition(&)
+        return @composition unless block_given?
+
+        @composition = Sbmt::Strangler::Action::Composition.new(&)
+      end
+
+      def composition?
+        !composition.nil?
       end
     end
   end

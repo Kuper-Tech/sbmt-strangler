@@ -22,8 +22,10 @@ module Sbmt
           def call(rails_controller, previous_responses: {})
             async_responses = async_steps.map do |name, step|
               Concurrent::Promises.future do
-                result = step.call(rails_controller, previous_responses: previous_responses)
-                {name => result}
+                Rails.application.executor.wrap do
+                  result = step.call(rails_controller, previous_responses: previous_responses)
+                  {name => result}
+                end
               end
             end
 

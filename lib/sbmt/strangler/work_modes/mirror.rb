@@ -9,8 +9,17 @@ module Sbmt
         include Dry::Monads::Result::Mixin
 
         def call
-          mirror_task = Concurrent::Promises.future { mirror_call }
-          proxy_task = Concurrent::Promises.future { http_request(http_params) }
+          mirror_task = Concurrent::Promises.future do
+            Rails.application.executor.wrap do
+              mirror_call
+            end
+          end
+
+          proxy_task = Concurrent::Promises.future do
+            Rails.application.executor.wrap do
+              http_request(http_params)
+            end
+          end
 
           mirror_call_result = mirror_task.value!
           origin_response = proxy_task.value!

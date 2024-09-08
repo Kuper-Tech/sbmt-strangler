@@ -37,7 +37,7 @@ module Sbmt
               result.merge(step_result)
             end
 
-            compose_block.call(responses)
+            compose_block.call(responses, rails_controller)
           rescue => error
             Sbmt::Strangler.logger.error(error.message)
             Sbmt::Strangler.error_tracker.error(error)

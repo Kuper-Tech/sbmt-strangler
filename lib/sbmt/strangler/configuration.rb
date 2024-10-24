@@ -9,6 +9,7 @@ module Sbmt
       option :action_controller_base_class, default: "ActionController::Base"
       option :error_tracker, default: "Sbmt::Strangler::ErrorTracker"
       option :flipper_actor, default: ->(_http_params, _headers) {}
+      option :composition_step_duration_metric_buckets, default: nil
 
       attr_reader :controllers, :http
 

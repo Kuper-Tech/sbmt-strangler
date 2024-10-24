@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "action/composition"
+require_relative "action/composition/step"
 
 module Sbmt
   module Strangler
@@ -36,9 +36,11 @@ module Sbmt
       end
 
       def composition(&)
-        return @composition unless block_given?
-
-        @composition = Sbmt::Strangler::Action::Composition.new(&)
+        if block_given?
+          @composition ||= Composition::Step.new(name: :root)
+          yield(@composition)
+        end
+        @composition
       end
 
       def composition?

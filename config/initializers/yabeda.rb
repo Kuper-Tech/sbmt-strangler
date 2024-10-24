@@ -4,7 +4,9 @@ module Sbmt
   module Strangler
     module Metrics
       module Yabeda
-        HTTP_BUCKETS = [0.01, 0.02, 0.04, 0.1, 0.2, 0.5, 0.8, 1, 1.5, 2, 5, 15, 30, 60].freeze
+        DEFAULT_BUCKETS = [0.01, 0.02, 0.04, 0.1, 0.2, 0.5, 0.8, 1, 1.5, 2, 5, 15, 30, 60].freeze
+        HTTP_BUCKETS = DEFAULT_BUCKETS
+        COMPOSITION_BUCKETS = DEFAULT_BUCKETS
 
         ::Yabeda.configure do
           group :sbmt_strangler do
@@ -35,6 +37,30 @@ module Sbmt
           end
         end
       end
+    end
+  end
+end
+
+# Declaring composition step duration metric in an `after_initialize` block
+# allows user to customize buckets in his app-level configuration file:
+#
+#     # config/initializers/strangler.rb
+#     Sbmt::Strangler.configure do |strangler|
+#       strangler.composition_step_duration_metric_buckets = [0.1, 0.2, 0.3]
+#     end
+#
+Rails.application.config.after_initialize do
+  ::Yabeda.configure do
+    group :sbmt_strangler do
+      composition_buckets =
+        ::Sbmt::Strangler.configuration.composition_step_duration_metric_buckets ||
+        ::Sbmt::Strangler::Metrics::Yabeda::COMPOSITION_BUCKETS
+
+      histogram :composition_step_duration,
+        tags: %i[step part type level parent controller action],
+        unit: :seconds,
+        buckets: composition_buckets,
+        comment: "Composition step duration"
     end
   end
 end

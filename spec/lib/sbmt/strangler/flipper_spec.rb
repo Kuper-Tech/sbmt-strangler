@@ -96,7 +96,7 @@ describe Sbmt::Strangler::Flipper do
     let(:feature_name) { "feature_name" }
 
     context "when feature enabled for current hour" do
-      around { |ex| travel_to(time_now, &ex) }
+      around { |ex| travel_to(time_to_travel_to, &ex) }
 
       before do
         hours_range = "ONTIME:#{start_hour}-#{end_hour}"
@@ -108,26 +108,29 @@ describe Sbmt::Strangler::Flipper do
       let(:start_hour) { "18" }
       let(:end_hour) { "23" }
 
+      let(:now) { DateTime.now.in_time_zone }
+      let(:time_to_travel_to) { now }
+
       context "when feature enabled for another hours range" do
-        let(:time_now) { DateTime.now.change(hour: 7) }
+        let(:time_to_travel_to) { now.change(hour: 7) }
 
         it("returns false") { expect(result).to be(false) }
       end
 
       context "when feature enabled for correct hours range" do
-        let(:time_now) { DateTime.now.change(hour: 20) }
+        let(:time_to_travel_to) { now.change(hour: 20) }
 
         it("returns true") { expect(result).to be(true) }
       end
 
       context "when feature enabled for end_hour" do
-        let(:time_now) { DateTime.now.change(hour: 23, minutes: 10) }
+        let(:time_to_travel_to) { now.change(hour: 23, minutes: 10) }
 
         it("returns false") { expect(result).to be(false) }
       end
 
       context "when feature enabled for start_hour" do
-        let(:time_now) { DateTime.now.change(hour: 18, minutes: 10) }
+        let(:time_to_travel_to) { now.change(hour: 18, minutes: 10) }
 
         it("returns true") { expect(result).to be(true) }
       end
@@ -135,7 +138,7 @@ describe Sbmt::Strangler::Flipper do
       context "when start_hour eq end_hour" do
         let(:start_hour) { "02" }
         let(:end_hour) { "02" }
-        let(:time_now) { DateTime.now.change(hour: 12) }
+        let(:time_to_travel_to) { now.change(hour: 12) }
 
         it("returns true") { expect(result).to be(true) }
       end
@@ -146,13 +149,13 @@ describe Sbmt::Strangler::Flipper do
 
         context "when result is false" do
           context "when time before start_hour" do
-            let(:time_now) { DateTime.now.change(hour: 16) }
+            let(:time_to_travel_to) { now.change(hour: 16) }
 
             it("returns false") { expect(result).to be(false) }
           end
 
           context "when time after end_hour" do
-            let(:time_now) { DateTime.now.change(hour: 7) }
+            let(:time_to_travel_to) { now.change(hour: 7) }
 
             it("returns false") { expect(result).to be(false) }
           end
@@ -160,21 +163,21 @@ describe Sbmt::Strangler::Flipper do
           context "when start and end hours close" do
             let(:start_hour) { "03" }
             let(:end_hour) { "02" }
-            let(:time_now) { DateTime.now.change(hour: 2, minutes: 10) }
+            let(:time_to_travel_to) { now.change(hour: 2, minutes: 10) }
 
             it("returns false") { expect(result).to be(false) }
           end
         end
 
         context "when result is true" do
-          let(:time_now) { DateTime.now.change(hour: 20) }
+          let(:time_to_travel_to) { now.change(hour: 20) }
 
           it("returns true") { expect(result).to be(true) }
 
           context "when start and end hours close" do
             let(:start_hour) { "03" }
             let(:end_hour) { "02" }
-            let(:time_now) { DateTime.now.change(hour: 3, minutes: 10) }
+            let(:time_to_travel_to) { now.change(hour: 3, minutes: 10) }
 
             it("returns true") { expect(result).to be(true) }
           end

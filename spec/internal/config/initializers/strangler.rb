@@ -44,27 +44,30 @@ Sbmt::Strangler.configure do |strangler|
         {json: mirror_result.to_json, status: :ok}
       end
 
-      action.composition do |composition|
-        composition
-          .sync(:service_a)
-          .process { |rails_controller| "service_a_response" }
-          .with_composition do |step_composition|
-          step_composition
-            .async(:service_b)
-            .process { |rails_controller, responses| "#{responses[:service_a]}_service_b_response" }
-
-          step_composition
-            .async(:service_c)
-            .process { |rails_controller, responses| "#{responses[:service_a]}_service_c_response" }
-
-          step_composition.compose do |responses|
-            [responses[:service_a], responses[:service_b], responses[:service_c]]
+      action.composition do |root|
+        root
+          .sync(:service_a) do |service_a|
+            service_a
+              .process do |rails_controller|
+                "service_a_response"
+              end
+              .async(:service_b) do |service_b|
+                service_b.process do |rails_controller, responses|
+                  "#{responses[:service_a]}_service_b_response"
+                end
+              end
+              .async(:service_c) do |service_c|
+                service_c.process do |rails_controller, responses|
+                  "#{responses[:service_a]}_service_c_response"
+                end
+              end
+              .compose do |responses|
+                [responses[:service_a], responses[:service_b], responses[:service_c]]
+              end
           end
-        end
-
-        composition.compose do |responses|
-          responses[:service_a].join(",")
-        end
+          .compose do |responses|
+            responses[:service_a].join(",")
+          end
       end
     end
 
@@ -79,18 +82,17 @@ Sbmt::Strangler.configure do |strangler|
         {json: mirror_result.to_json, status: :ok}
       end
 
-      action.composition do |composition|
-        composition
-          .async(:service_a)
-          .process { |rails_controller| "service_a_response" }
-
-        composition
-          .async(:service_b)
-          .process { |rails_controller| "service_b_response" }
-
-        composition.compose do |responses|
-          [responses[:service_a], responses[:service_b]].join(",")
-        end
+      action.composition do |root|
+        root
+          .async(:service_a) do |service_a|
+            service_a.process { |rails_controller| "service_a_response" }
+          end
+          .async(:service_b) do |service_b|
+            service_b.process { |rails_controller| "service_b_response" }
+          end
+          .compose do |responses|
+            [responses[:service_a], responses[:service_b]].join(",")
+          end
       end
     end
   end

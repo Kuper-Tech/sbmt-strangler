@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
-source "https://nexus.sbmt.io/repository/rubygems/"
+source ENV.fetch("NEXUS_PUBLIC_SOURCE_URL", "https://rubygems.org")
 
 gemspec

@@ -37,11 +37,16 @@ module Sbmt
           def with_open_telemetry_tracing(part: nil)
             return yield unless Object.const_defined?(:OpenTelemetry)
 
-            span_name = "Composition step: #{name}"
-            span_name += " (#{part})" unless part.nil?
+            span_name = "Composition step: #{name} (#{type})"
+            span_name += " / #{part}" unless part.nil?
 
-            span_attrs = {type: type.to_s, level: level}
-            span_attrs[:parent] = parent.name.to_s unless parent.nil?
+            span_attrs = {
+              "step" => name.to_s,
+              "type" => type.to_s,
+              "level" => level
+            }
+            span_attrs["part"] = part.to_s unless part.nil?
+            span_attrs["parent"] = parent.name.to_s unless parent.nil?
 
             result = nil
             ::OpenTelemetry.tracer_provider.tracer("Sbmt::Strangler")

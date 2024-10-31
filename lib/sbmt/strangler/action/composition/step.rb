@@ -58,7 +58,7 @@ module Sbmt
               end
 
               # process composition if there are nested steps
-              if composable?
+              if composite?
                 result = call_composition(rails_controller, previous_responses: previous_responses.merge(name => result))
               end
 
@@ -66,28 +66,40 @@ module Sbmt
             end
           end
 
+          def composite?
+            @sync_steps.any? || @async_steps.any?
+          end
+
           def sync(name, &)
-            step = Sbmt::Strangler::Action::Composition::Step.new(
-              name: name,
-              type: :sync,
-              parent: self,
-              level: level + 1
-            )
-            yield(step) if block_given?
-            @sync_steps[name] = step
-            step
+            if @async_steps.key?(name)
+              raise Errors::ConfigurationError, "Composition step #{name.inspect} has been already defined as async"
+            end
+
+            @sync_steps[name] ||=
+              Sbmt::Strangler::Action::Composition::Step.new(
+                name: name,
+                type: :sync,
+                parent: self,
+                level: level + 1
+              )
+            yield(@sync_steps[name]) if block_given?
+            self
           end
 
           def async(name, &)
-            step = Sbmt::Strangler::Action::Composition::Step.new(
-              name: name,
-              type: :async,
-              parent: self,
-              level: level + 1
-            )
-            yield(step) if block_given?
-            @async_steps[name] = step
-            step
+            if @sync_steps.key?(name)
+              raise Errors::ConfigurationError, "Composition step #{name.inspect} has been already defined as sync"
+            end
+
+            @async_steps[name] ||=
+              Sbmt::Strangler::Action::Composition::Step.new(
+                name: name,
+                type: :async,
+                parent: self,
+                level: level + 1
+              )
+            yield(@async_steps[name]) if block_given?
+            self
           end
 
           def process(&block)
@@ -100,32 +112,30 @@ module Sbmt
             self
           end
 
-          alias_method :with_composition, :tap
-
           private
 
           attr_reader :sync_steps, :async_steps, :process_lambda, :compose_lambda
 
-          def composable?
-            @sync_steps.any? || @async_steps.any?
-          end
-
           def call_composition(rails_controller, previous_responses: {})
-            async_responses = async_steps.map do |name, step|
-              Concurrent::Promises.future do
-                Rails.application.executor.wrap do
-                  result = step.call(rails_controller, previous_responses: previous_responses)
-                  {name => result}
+            responses = nil
+
+            with_metrics(part: :substeps, rails_controller: rails_controller) do
+              async_responses = async_steps.map do |name, step|
+                Concurrent::Promises.future do
+                  Rails.application.executor.wrap do
+                    result = step.call(rails_controller, previous_responses: previous_responses)
+                    {name => result}
+                  end
                 end
               end
-            end
 
-            sync_responses = sync_steps.reduce(previous_responses) do |result, (name, step)|
-              result.merge(name => step.call(rails_controller, previous_responses: result))
-            end
+              sync_responses = sync_steps.reduce(previous_responses) do |result, (name, step)|
+                result.merge(name => step.call(rails_controller, previous_responses: result))
+              end
 
-            responses = async_responses.map(&:value).reduce(sync_responses) do |result, step_result|
-              result.merge(step_result)
+              responses = async_responses.map(&:value).reduce(sync_responses) do |result, step_result|
+                result.merge(step_result)
+              end
             end
 
             with_metrics(part: :compose, rails_controller: rails_controller) do

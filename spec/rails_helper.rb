@@ -7,6 +7,10 @@ ENGINE_ROOT = Pathname.new(File.expand_path("..", __dir__))
 
 ENV["RAILS_ENV"] = "test" # rubocop:disable Rails/OverridingEnvVars
 
+# В Rails 7 есть баг - обращение к Logger без require.
+# См. https://github.com/rails/rails/pull/54264
+require "logger"
+
 require "combustion"
 
 begin

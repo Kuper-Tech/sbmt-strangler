@@ -31,7 +31,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "faraday", "> 2.0"
   spec.add_dependency "faraday-net_http_persistent", "~> 2.0"
   spec.add_dependency "net-http-persistent", ">= 4.0.1"
-  spec.add_dependency "rails", ">= 6.1", "< 8"
+  spec.add_dependency "rails", ">= 6.1", "< 8.1"
   spec.add_dependency "yabeda", ">= 0.11"
   spec.add_dependency "flipper", ">= 1.2.2"
   spec.add_dependency "concurrent-ruby", ">= 1.2.3"

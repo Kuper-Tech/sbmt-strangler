@@ -4,7 +4,8 @@
 
 versions_map = {
   "7.0" => %w[3.1],
-  "7.1" => %w[3.2 3.3]
+  "7.1" => %w[3.2 3.3],
+  "8.0" => %w[3.2 3.3]
 }
 
 current_ruby_version = RUBY_VERSION.split(".").first(2).join(".")

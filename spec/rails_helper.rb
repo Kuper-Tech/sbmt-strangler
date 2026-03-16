@@ -28,7 +28,7 @@ begin
   end
 rescue => e
   warn "💥 Failed to load the app: #{e.message}\n#{e.backtrace.join("\n")}"
-  exit(1)
+  exit(1) # rubocop:disable Rails/Exit
 end
 
 Rails.application.load_tasks

@@ -54,6 +54,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "vcr"
   spec.add_development_dependency "standard", ">= 1.7"
   spec.add_development_dependency "zeitwerk"
-  spec.add_development_dependency "sentry-rails", "> 5.2.0"
+  spec.add_development_dependency "sentry-rails", "> 6.0.0"
   spec.add_development_dependency "debug"
 end

@@ -14,7 +14,7 @@ module Sbmt
       end
 
       def log_unallowed_params
-        unallowed_params = all_request_params - allowed_request_params
+        unallowed_params = all_request_params_keys - allowed_request_params_keys
         Sbmt::Strangler.logger.log_warn(<<~WARN.strip) if unallowed_params.any?
           Not allowed parameters in #{controller_path}##{action_name}: #{unallowed_params}
         WARN
@@ -47,21 +47,25 @@ module Sbmt
 
       private
 
-      delegate :http_params, :allowed_params, :controller_path, :action_name, to: :rails_controller
+      delegate :http_params, :strangler_action, :controller_path, :action_name, to: :rails_controller
 
       def common_tags
         {
-          params: allowed_request_params.join(","),
+          params: allowed_request_params_keys.join(","),
           controller: controller_path,
           action: action_name
         }
       end
 
-      def allowed_request_params
-        @allowed_request_params ||= allowed_params.keys.map(&:to_s).sort.uniq
+      def allowed_request_params_keys
+        @allowed_request_params ||= if strangler_action.params_tracking_allowlist.blank?
+          all_request_params_keys
+        else
+          (all_request_params_keys & strangler_action.params_tracking_allowlist).sort
+        end
       end
 
-      def all_request_params
+      def all_request_params_keys
         @all_request_params ||= http_params.keys.map(&:to_s).sort.uniq
       end
     end

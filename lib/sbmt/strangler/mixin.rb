@@ -9,12 +9,6 @@ module Sbmt
         params.to_unsafe_h.except(:action, :controller, :format)
       end
 
-      def allowed_params
-        return http_params if strangler_action.params_tracking_allowlist.blank?
-
-        params.permit(*strangler_action.params_tracking_allowlist).to_h
-      end
-
       def allowed_headers
         if strangler_action.headers_allowlist.blank?
           return request.headers.select { |name, _| name.starts_with?("HTTP_") }.to_h

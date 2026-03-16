@@ -8,6 +8,8 @@ module Sbmt
       class Mirror < Base
         include Dry::Monads::Result::Mixin
 
+        MATCH_ERROR = :error
+
         def call
           mirror_task = Concurrent::Promises.future do
             Rails.application.executor.wrap do
@@ -65,8 +67,6 @@ module Sbmt
           handle_error(err)
           Failure(nil)
         end
-
-        MATCH_ERROR = :error
 
         def compare_call(origin_result, mirror_result)
           cmp = strangler_action.compare.call(origin_result, mirror_result)

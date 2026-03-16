@@ -14,7 +14,7 @@ module Sbmt
           return request.headers.select { |name, _| name.starts_with?("HTTP_") }.to_h
         end
 
-        request.headers.select { |name, _| name.in?(strangler_action.headers_allowlist) }.to_h
+        request.headers.select { |name, _| name.in?(strangler_action.headers_allowlist) }.to_h # rubocop:disable Style/HashSlice
       end
 
       def http_request(payload)

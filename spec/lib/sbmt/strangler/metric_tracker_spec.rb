@@ -58,37 +58,37 @@ describe Sbmt::Strangler::MetricTracker do
   describe "#track_params_usage" do
     subject(:call) { tracker.track_params_usage }
 
-    include_examples "increments Yabeda metric", :params_usage
+    it_behaves_like "increments Yabeda metric", :params_usage
   end
 
   describe "#track_work_mode" do
     subject(:call) { tracker.track_work_mode("proxy") }
 
-    include_examples "increments Yabeda metric", :work_mode, {mode: "proxy"}
+    it_behaves_like "increments Yabeda metric", :work_mode, {mode: "proxy"}
   end
 
   describe "#track_mirror_call" do
     subject(:call) { tracker.track_mirror_call(false) }
 
-    include_examples "increments Yabeda metric", :mirror_call, {success: "false"}
+    it_behaves_like "increments Yabeda metric", :mirror_call, {success: "false"}
   end
 
   describe "#track_compare_call" do
     subject(:call) { tracker.track_compare_call(true) }
 
-    include_examples "increments Yabeda metric", :compare_call, {success: "true"}
+    it_behaves_like "increments Yabeda metric", :compare_call, {success: "true"}
   end
 
   describe "#track_compare_call_result" do
     subject(:call) { tracker.track_compare_call_result(false) }
 
-    include_examples "increments Yabeda metric", :compare_call_result, {value: "false"}
+    it_behaves_like "increments Yabeda metric", :compare_call_result, {value: "false"}
   end
 
   describe "#track_render_call" do
     subject(:call) { tracker.track_render_call(true) }
 
-    include_examples "increments Yabeda metric", :render_call, {success: "true"}
+    it_behaves_like "increments Yabeda metric", :render_call, {success: "true"}
   end
 
   describe "#log_unallowed_params" do

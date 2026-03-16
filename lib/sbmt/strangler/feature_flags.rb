@@ -8,6 +8,7 @@ module Sbmt
         replace
       ]
       FEATURES_HEADER_NAME = "HTTP_STRANGLER_FEATURES"
+      FEATURE_NAME_SANITIZER = -> { _1.to_s.gsub(/[^A-Za-z0-9]+/, "-") }
 
       attr_reader :strangler_action, :rails_controller
 
@@ -27,8 +28,6 @@ module Sbmt
       private
 
       delegate :add, :enabled?, :enabled_on_time?, to: "Sbmt::Strangler::Flipper"
-
-      FEATURE_NAME_SANITIZER = -> { _1.to_s.gsub(/[^A-Za-z0-9]+/, "-") }
 
       def feature_name(flag_name)
         sanitized_controller_name = FEATURE_NAME_SANITIZER.call(strangler_action.controller.name)

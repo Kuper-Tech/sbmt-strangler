@@ -7,21 +7,24 @@ describe Sbmt::Strangler::MetricTracker do
     instance_double(
       Api::StoresController,
       http_params: http_params,
-      allowed_params: allowed_params,
+      strangler_action: instance_double(
+        Sbmt::Strangler::Action,
+        params_tracking_allowlist: params_tracking_allowlist
+      ),
       controller_path: controller_path,
       action_name: action_name
     )
   end
 
   let(:http_params) { {a: 123, f: "asdf"} }
-  let(:allowed_params) { {a: 123} }
+  let(:params_tracking_allowlist) { ["a"] }
   let(:controller_path) { "api/stores" }
   let(:action_name) { "index" }
 
   shared_examples "increments Yabeda metric" do |metric_name, extra_tags = {}|
     let(:common_tags) do
       {
-        params: allowed_params.keys.join(","),
+        params: "a",
         controller: controller_path,
         action: action_name
       }
@@ -31,6 +34,24 @@ describe Sbmt::Strangler::MetricTracker do
       metric = ::Yabeda.sbmt_strangler.send(metric_name)
       expect(metric).to receive(:increment).with(common_tags.merge(extra_tags))
       call
+    end
+
+    context "without params_tracking_allowlist" do
+      let(:params_tracking_allowlist) { nil }
+
+      let(:common_tags) do
+        {
+          params: "a,f",
+          controller: controller_path,
+          action: action_name
+        }
+      end
+
+      it "increments Yabeda metric sbmt_strangler.#{metric_name}" do
+        metric = ::Yabeda.sbmt_strangler.send(metric_name)
+        expect(metric).to receive(:increment).with(common_tags.merge(extra_tags))
+        call
+      end
     end
   end
 
